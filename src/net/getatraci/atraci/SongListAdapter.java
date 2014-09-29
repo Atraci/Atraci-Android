@@ -1,6 +1,5 @@
 package net.getatraci.atraci;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
@@ -14,20 +13,20 @@ import android.widget.TextView;
 public class SongListAdapter extends BaseAdapter {
 	
     private LayoutInflater inflater;
-    private ArrayList<MusicItem> items;
+    private MusicTypeCategories items;
     
     int cnt;
-    public SongListAdapter(Context c, ArrayList<MusicItem> arr) {
+    public SongListAdapter(Context c, MusicTypeCategories arr) {
         inflater = LayoutInflater.from(c);
         this.items = arr;
     }
 
     public int getCount() {
-        return items.size();
+        return items.getSongCount();
     }
 
     public MusicItem getItem(int position) {
-        return items.get(position);
+        return items.getSong(position);
     }
 
     public long getItemId(int position) {
@@ -50,14 +49,16 @@ public class SongListAdapter extends BaseAdapter {
 
         picture = (ImageView)v.getTag(R.id.picture);
         name = (TextView)v.getTag(R.id.text);
+        
 
+        
 		try {
-			new ImageDownloader(picture, items.get(i).getImage()).get();
+			new ImageDownloader(picture, items.getSong(i).getImage()).get();
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        name.setText(items.get(i).getTrack());
+        name.setText(items.getSong(i).getTrack());
 
         return v;
     }

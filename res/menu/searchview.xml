@@ -7,5 +7,12 @@
           android:title="@string/action_search"
           android:showAsAction="always"
           android:actionViewClass="android.widget.SearchView" />
+        
+        <item android:id="@+id/menuRefresh"
+         android:icon="@drawable/ic_action_refresh"
+         android:title="@string/menuitem_refresh"
+         android:alphabeticShortcut="r"
+         android:orderInCategory="1"
+         android:showAsAction="always" />
 
 </menu>

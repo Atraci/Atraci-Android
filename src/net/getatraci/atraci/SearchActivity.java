@@ -1,6 +1,5 @@
 package net.getatraci.atraci;
 
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -96,17 +95,20 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 	public Loader<LFMArrayAdapter> onCreateLoader(int id, Bundle bundle) {
 		final String q = (bundle == null ? null : bundle.getString("query"));
 		return new AsyncTaskLoader<LFMArrayAdapter>(this) {
+			LFMArrayAdapter data;
+			
 			@Override
 			public LFMArrayAdapter loadInBackground() {
-
-				if(q == null || q.length() == 0)
-					return new LFMArrayAdapter(SearchActivity.this, new ArrayList<MusicItem>());
+				
+				if(q == null || q.length() == 0) {
+					return new LFMArrayAdapter(SearchActivity.this, new MusicTypeCategories());
+				}
 				
 				try{
 					String readJSON = JSONParser.getJSON(JSONParser.LASTFM_API_URL+ q);
 					JSONObject jsonObject = new JSONObject(readJSON);
 					JSONArray array = jsonObject.getJSONObject("response").getJSONArray("docs");
-					ArrayList<MusicItem> data = JSONParser.getListFromJsonArray(array, JSONParser.LFM);
+					MusicTypeCategories data = JSONParser.getListFromJsonArray(array, JSONParser.LFM);
 					Log.d("ATRACI", "Search Data: " + data.toString() + "\n\n" + q);
 					LFMArrayAdapter adapt = new LFMArrayAdapter(SearchActivity.this, data);
 					return adapt;
@@ -123,14 +125,34 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 
 			@Override
 			public void deliverResult(LFMArrayAdapter data) {
-				// TODO Auto-generated method stub
-				super.deliverResult(data);
+				this.data = data;
+				if(isStarted()) {
+					super.deliverResult(data);
+				}
 			}
 
 			@Override
 			protected void onStartLoading() {
-				progress.show();
-				forceLoad();
+				if(data !=null) {
+					deliverResult(data);
+				}
+				if(data == null){
+					forceLoad();
+				}
+			}
+			
+			@Override
+			protected void onStopLoading() {
+				//Attempt to cancel the current load task, if possible.
+				cancelLoad();
+			}
+			
+			@Override
+			protected void onReset() {
+				super.onReset();
+				//Ensure that the loader is stopped.
+				onStopLoading();
+				data = null;
 			}
 		};
 	}
@@ -138,7 +160,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 	@Override
 	public void onLoadFinished(Loader<LFMArrayAdapter> loader, LFMArrayAdapter adapter) {
 		list.setAdapter(adapter);
-		progress.dismiss();
+		//progress.dismiss();
 	}
 
 	@Override
@@ -173,7 +195,10 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 
 	@Override
 	public boolean onQueryTextSubmit(String query) {
-		// TODO Auto-generated method stub
-		return false;
+		Bundle bundle = new Bundle();
+		String text = query.replaceAll(" ", "%20");
+		bundle.putString("query", text);
+		getLoaderManager().restartLoader(LID_LFM, bundle, SearchActivity.this);
+		return true;
 	}
 }

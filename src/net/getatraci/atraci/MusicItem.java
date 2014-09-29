@@ -79,11 +79,11 @@ public class MusicItem implements Parcelable {
 
 
 	public void setType() {
-		if(track!="")
+		if(!"".equals(track))
 			type = TRACK;
-		else if(album != "")
+		else if(!"".equals(album))
 			type = ALBUM;
-		else if(artist != "")
+		else if(!"".equals(artist))
 			type = ARTIST;
 		else
 			type = UNDEFINED;
@@ -113,6 +113,11 @@ public class MusicItem implements Parcelable {
 
 	public void setYoutube(String youtube) {
 		this.youtube = youtube;
+	}
+	
+	@Override
+	public String toString() {
+		return "Track: " + track + "  Album: " + album + "  Artist: " + artist;
 	}
 	
 }

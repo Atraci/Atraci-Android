@@ -7,5 +7,15 @@
     <string name="action_search">Search</string>
     <string name="seach_hint">Search Title/Artist/Album</string>
     <string name="title_activity_player">PlayerActivity</string>
+    <string name="menuitem_refresh">Refresh</string>
+    <string name="lyrics">Fetching lyrics!</string>
+    <string name="drawer_open">Atraci</string>
+    <string name="drawer_close">Closed</string>
+    
+    <string-array name="navigation_items">
+    <item>Top Tracks</item>
+    <item>Top 100</item>
+    <item>My Playlist</item>
+</string-array>
 
 </resources>

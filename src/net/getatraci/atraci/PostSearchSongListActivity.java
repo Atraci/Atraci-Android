@@ -1,7 +1,5 @@
 package net.getatraci.atraci;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -14,6 +12,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -24,23 +25,24 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	GridView m_gridview;
 	private static final int LID_PSSLA = 1;
 	private ProgressDialog progress;
-	private ArrayList<MusicItem> results;
+	private MusicTypeCategories results;
+	private Menu optionsMenu;
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
-		setContentView(R.layout.activity_home);
+		setContentView(R.layout.activity_postsearchsonglist);
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		final Bundle bundle = getIntent().getExtras();
 		
-		actionBar.setTitle(bundle.getString("query"));
+		actionBar.setTitle("Results");
 
 		m_gridview = (GridView) findViewById(R.id.gridview);
 		progress = new ProgressDialog(this);
 		progress.setTitle("Loading...");
 		progress.setMessage("Loading tracks...\nPlease Wait!");
-		
+		setRefreshActionButtonState(true);
 		getLoaderManager().initLoader(LID_PSSLA, bundle, this);
 		
 		m_gridview.setOnItemClickListener(this);
@@ -48,11 +50,34 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 
 	}
 	
+	public void setRefreshActionButtonState(final boolean refreshing) {
+	    if (optionsMenu != null) {
+	        final MenuItem refreshItem = optionsMenu
+	            .findItem(R.id.menuRefresh);
+	        if (refreshItem != null) {
+	            if (refreshing) {
+	                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+	            } else {
+	                refreshItem.setActionView(null);
+	            }
+	        }
+	    }
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    this.optionsMenu = menu;
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.postsearch, menu);
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
 	@Override
 	public Loader<SongListAdapter> onCreateLoader(int id, Bundle bundle) {
 		
 		final String q = JSONParser.ATRACI_API_URL + bundle.getString("query").replaceAll(" ", "%20");
 		return  new AsyncTaskLoader<SongListAdapter>(this) {
+			SongListAdapter data;
 			@Override
 			public SongListAdapter loadInBackground() {
 				try {
@@ -76,30 +101,50 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 			public void deliverResult(SongListAdapter data) {
 				// TODO Auto-generated method stub
 				super.deliverResult(data);
+				progress.dismiss();
 			}
 
 			@Override
 			protected void onStartLoading() {
-				progress.show();
-				forceLoad();
+				if(data !=null) {
+					deliverResult(data);
+				}
+				if(data == null){
+					progress.show();
+					forceLoad();
+				}
+			}
+			
+			@Override
+			protected void onStopLoading() {
+				//Attempt to cancel the current load task, if possible.
+				cancelLoad();
+			}
+			
+			@Override
+			protected void onReset() {
+				super.onReset();
+				//Ensure that the loader is stopped.
+				onStopLoading();
+				data = null;
 			}
 		};
 	}
 	
-	private void startPlayerActivity(String link, String name) {
+	private void startPlayerActivity(String link, String name, String artist) {
 		Intent intent = new Intent(this, PlayerActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("query", link);
 		bundle.putString("title", name);
+		bundle.putString("artist", artist);
 		intent.putExtras(bundle);
 		startActivity(intent);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<SongListAdapter> loader, SongListAdapter adapter) {
-		progress.dismiss();
 		m_gridview.setAdapter(adapter);
-
+		setRefreshActionButtonState(false);
 	}
 
 	@Override
@@ -112,7 +157,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		GridView grid = (GridView)adapter.findViewById(R.id.gridview);
 		MusicItem mi = ((MusicItem)grid.getAdapter().getItem(position));
-		startPlayerActivity(mi.getYoutube(), mi.getTrack());
+		startPlayerActivity(mi.getArtist() + " - " + mi.getTrack(), mi.getTrack(), mi.getArtist());
 		
 	}
 

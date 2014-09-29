@@ -7,22 +7,27 @@
     android:orientation="vertical"
     tools:context="net.getatraci.atraci.PlayerActivity" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+    <!-- <com.google.android.youtube.player.YouTubePlayerView -->
+    <!-- android:id="@+id/youtube_view" -->
+    <!-- android:layout_width="wrap_content" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_margin="12dip" /> -->
 
-    
-         <com.google.android.youtube.player.YouTubePlayerView
+    <WebView
         android:id="@+id/youtube_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="12dip" />
-    
 
-    <!-- <VideoView
-        android:id="@+id/myvideoview"
+    <TextView
+        android:id="@+id/lyrics_box"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" /> -->
+        android:layout_height="fill_parent"
+        android:text="@string/lyrics" />
+
+    <!-- <VideoView -->
+    <!-- android:id="@+id/myvideoview" -->
+    <!-- android:layout_width="fill_parent" -->
+    <!-- android:layout_height="wrap_content" /> -->
 
 </LinearLayout>
