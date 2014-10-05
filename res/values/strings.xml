@@ -11,11 +11,21 @@
     <string name="lyrics">Fetching lyrics!</string>
     <string name="drawer_open">Atraci</string>
     <string name="drawer_close">Closed</string>
-    
+
     <string-array name="navigation_items">
-    <item>Top Tracks</item>
-    <item>Top 100</item>
-    <item>My Playlist</item>
-</string-array>
+        <item>Home</item>
+        <item>Top Tracks</item>
+        <item>Top 100</item>
+        <item>My Playlist</item>
+    </string-array>
+
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="backarrow">&lt;&lt;</string>
+    <string name="forwardarrow">&gt;&gt;</string>
+    <string name="title_activity_playlist_selector">PlaylistSelectorActivity</string>
+    <string name="playlists">My Playlists</string>
+    <string name="top100">Top 100</string>
+    <string name="top_tracks">Top Tracks</string>
 
 </resources>

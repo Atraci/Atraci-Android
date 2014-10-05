@@ -6,21 +6,13 @@
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
     android:paddingLeft="32dp" >
-
-
-        <ImageView
-            android:id="@+id/album_art"
-            android:layout_width="25dp"
-            android:contentDescription="@+string/album_thumbnail"
-            android:layout_height="25dp"
-            android:layout_gravity="left" />
-
-        <TextView
-            android:id="@+id/item1"
+    
+            <TextView
+            android:id="@+id/commit_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:paddingLeft="50dp"
             android:textSize="@dimen/font_size" />
+    
 
 </RelativeLayout>

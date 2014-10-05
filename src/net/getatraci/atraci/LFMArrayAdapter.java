@@ -102,15 +102,18 @@ public class LFMArrayAdapter extends BaseAdapter {
 		
 		TextView txt = (TextView) convertView.findViewById(R.id.item1);
 		ImageView img = (ImageView) convertView.findViewById(R.id.album_art);
-		
+		String text = type == TYPE_ARTIST ? "Artists" : type == TYPE_ALBUM ? "Albums" : "Songs";
 		if(m_data.getTotalSize() < 1)
 			return convertView;
 		
-		Log.d("ATRACI", "Position: " + position + " Artist Size: "+m_data.getArtistCount() + "Album Size: " + m_data.getAlbumCount() + "Song Size: "+ m_data.getSongCount() + " Total Size: " + m_data.getTotalSize());
+		try {
+		Log.d("ATRACI", "Type: " + text + "  Position: " + position + " Artist Size: "+m_data.getArtistCount() + "Album Size: " + m_data.getAlbumCount() + "Song Size: "+ m_data.getSongCount() + " Total Size: " + m_data.getTotalSize());
         switch(type) {
         case TYPE_SONG:
-			new ImageDownloader(img,m_data.getSong(Math.abs(position - m_data.getAlbumCount()- m_data.getArtistCount()-3)).getImage());
-        	txt.setText(m_data.getSong(Math.abs(position - m_data.getAlbumCount()- m_data.getArtistCount()-3)).getTrack());
+        	
+			new ImageDownloader(img,m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getImage());
+//        	txt.setText(m_data.getSong(Math.abs(position - m_data.getAlbumCount()- m_data.getArtistCount()-3)).getTrack());
+			txt.setText(m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getTrack());
         	break;
         case TYPE_ALBUM:
         	new ImageDownloader(img,m_data.getAlbum(position-(m_data.getArtistCount()+2)).getImage());
@@ -121,6 +124,10 @@ public class LFMArrayAdapter extends BaseAdapter {
         	txt.setText(m_data.getArtist(position-1).getArtist());
         	break;
         }
+		} catch (Exception e) {
+			Log.e("ATRACI", ""+e.getMessage(), e);
+			return convertView;
+		}
 		
 		return convertView;
 	}

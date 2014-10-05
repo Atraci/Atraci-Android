@@ -9,10 +9,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class HomeActivity extends Activity {
+public class HomeActivity extends Activity implements OnItemClickListener{
 
 	private String[] mNavigationDrawerItemTitles;
 	private DrawerLayout mDrawerLayout;
@@ -51,9 +53,10 @@ public class HomeActivity extends Activity {
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerList.setOnItemClickListener(this);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+        this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeNewsFragment()).commit();
 	}
 	
     /* Called whenever we call invalidateOptionsMenu() */
@@ -102,5 +105,30 @@ public class HomeActivity extends Activity {
 	private void openSearch() {
 		Intent i = new Intent(this, SearchActivity.class);
 		startActivity(i);
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		switch(arg2) {
+		case 0:
+			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeNewsFragment()).commit();
+			getActionBar().setTitle(getResources().getString(R.string.app_name));
+			break;
+		case 1:
+			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment()).commit();
+			getActionBar().setTitle(getResources().getString(R.string.top_tracks));
+			break;
+		case 2:
+			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment()).commit();
+			getActionBar().setTitle(getResources().getString(R.string.top100));
+			break;
+		case 3:
+			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment()).commit();
+			getActionBar().setTitle(getResources().getString(R.string.playlists));
+			break;
+		}
+		mDrawerList.setItemChecked(arg2, true);
+		mDrawerLayout.closeDrawer(mDrawerList);
+		
 	}
 }

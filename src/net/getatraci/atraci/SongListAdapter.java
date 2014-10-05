@@ -58,7 +58,7 @@ public class SongListAdapter extends BaseAdapter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        name.setText(items.getSong(i).getTrack());
+        name.setText(items.getSong(i).getTrack()+"\n"+items.getSong(i).getArtist());
 
         return v;
     }

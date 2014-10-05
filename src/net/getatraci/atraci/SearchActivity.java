@@ -61,7 +61,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 		
 		Intent intent = new Intent(SearchActivity.this, PostSearchSongListActivity.class);
 		Bundle extras = new Bundle();
-		extras.putString("query", ("\"" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"\"");
+		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"");
 		extras.putInt("type", mi.getType());
 		intent.putExtras(extras);
 		startActivity(intent);

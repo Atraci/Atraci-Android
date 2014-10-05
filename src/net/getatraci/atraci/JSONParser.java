@@ -119,6 +119,26 @@ public class JSONParser {
     	return lyrics;
     }
     
+    public static ArrayList<CommitItem> getCommits() {
+    	
+    	ArrayList<CommitItem> commits = new ArrayList<CommitItem>();
+    	try {
+			String json = JSONParser.getJSON("https://api.github.com/repos/Atraci/Atraci-Android/commits");
+			JSONArray array = new JSONArray(json);
+			for(int i = 0; i < array.length(); i++) {
+				JSONObject jo = array.getJSONObject(i).getJSONObject("commit");
+				CommitItem ci = new CommitItem();
+				String s = jo.getString("message");
+				ci.setMessage(s.substring(0,(s.length() < 80 ? s.length() : 80)));
+				commits.add(ci);
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return commits;
+    }
+    
     private static void parseLFM(String currentKey, JSONObject jo, MusicItem lfi) throws JSONException {
         if(currentKey.equals("track"))
         	lfi.setTrack(jo.getString(currentKey));
