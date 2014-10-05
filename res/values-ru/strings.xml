@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Atraci</string>
+    <string name="hello_world">Привет, мир!</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_search">Поиск</string>
+    <string name="seach_hint">Искать по Названию/Артисту/Альбому</string>
+    <string name="title_activity_player">PlayerActivity</string>
+    <string name="menuitem_refresh">Обновить</string>
+    <string name="lyrics">Получаем текст трека!</string>
+    <string name="drawer_open">Atraci</string>
+    <string name="drawer_close">Закрыт</string>
+    
+    <string-array name="navigation_items">
+    <item>Топ треки</item>
+    <item>Топ 100</item>
+    <item>Мой плей-лист</item>
+</string-array>
+
+</resources>
