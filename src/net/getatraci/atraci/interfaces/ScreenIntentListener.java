@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.interfaces;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

@@ -1,5 +1,6 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.activities;
 
+import net.getatraci.atraci.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;

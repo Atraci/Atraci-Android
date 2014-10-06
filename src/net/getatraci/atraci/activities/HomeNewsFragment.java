@@ -1,7 +1,11 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.activities;
 
 import java.util.ArrayList;
 
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.CommitItem;
+import net.getatraci.atraci.json.JSONParser;
+import net.getatraci.atraci.loaders.CommitItemAdapter;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;

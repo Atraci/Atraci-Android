@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.activities;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,8 +6,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.interfaces.PlayerJSInterface;
+import net.getatraci.atraci.json.JSONParser;
+
 import org.json.JSONException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -15,11 +21,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AsyncTaskLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -36,6 +47,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
@@ -52,8 +64,11 @@ public class PlayerActivity extends Activity implements LoaderCallbacks<String[]
 	Button play_button,prev_button, next_button;
 	WebView wv;
 	String[] query;
+	Notification notification;
+	NotificationManager mNotifyMgr;
+	private static final int NOTIFY_ID=1;
 	
-	private static final String YOUTUBE_API_KEY = "AIzaSyCqB8IccdaZbaWp7tp-Xjcm5J9IOpj8bFs";
+//	private static final String YOUTUBE_API_KEY = "AIzaSyCqB8IccdaZbaWp7tp-Xjcm5J9IOpj8bFs";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +84,7 @@ public class PlayerActivity extends Activity implements LoaderCallbacks<String[]
 //		values = bundle.getStringArray("values");
 		getLoaderManager().initLoader(123, bundle, this);
 		actionBar.setTitle("Now Playing");
-		
+		mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		play_button = (Button)findViewById(R.id.playbut);
 		play_button.setOnClickListener(new OnClickListener() {
 			
@@ -229,10 +244,11 @@ public class PlayerActivity extends Activity implements LoaderCallbacks<String[]
 			String[] data;
 			@Override
 			public String[] loadInBackground() {
-			String[] results = new String[2];
+			String[] results = new String[3];
 				try {
 					results[0] = JSONParser.parseYoutube(query[position]);
 					//results[1] = JSONParser.getLyrics(artist, title);
+					results[2] = query[position]; 
 					return results;
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -301,13 +317,21 @@ public class PlayerActivity extends Activity implements LoaderCallbacks<String[]
 		TextView tv = (TextView)findViewById(R.id.lyrics_box);
         tv.setMovementMethod(new ScrollingMovementMethod());
 
-        tv.setText(arg1[1]);
+        tv.setText(arg1[1]);  
+        showNotification(arg1[2], "Now Playing", arg1[2]);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<String[]> arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void onBackPressed() {
+		stopVideo();
+		cancelNotification();
+		finish();
 	}
 
 //	@Override
@@ -317,6 +341,35 @@ public class PlayerActivity extends Activity implements LoaderCallbacks<String[]
 //				Toast.LENGTH_LONG).show();
 //		
 //	}
+	
+	public void showNotification(String ticker, String title, String content) {
+        
+        Intent notIntent = new Intent(this, PlayerActivity.class);
+        
+        notIntent.setAction(Intent.ACTION_MAIN);
+        notIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|
+                Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0,
+          notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+         
+        Notification.Builder builder = new Notification.Builder(this);
+         
+        builder.setContentIntent(pendInt)
+          .setSmallIcon(R.drawable.ic_launcher)
+          .setTicker(ticker)
+          .setOngoing(true)
+          .setContentTitle(title)
+          .setContentText(content);
+        notification = builder.build();
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(NOTIFY_ID, notification);
+	}
+	
+	public void cancelNotification() {
+		mNotifyMgr.cancel(NOTIFY_ID);
+	}
+
 	
 	private String getHtml(String q) {
 	       InputStream is;

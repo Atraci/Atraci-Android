@@ -1,4 +1,10 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.activities;
+
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.MusicItem;
+import net.getatraci.atraci.data.MusicTypeCategories;
+import net.getatraci.atraci.json.JSONParser;
+import net.getatraci.atraci.loaders.SongListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;

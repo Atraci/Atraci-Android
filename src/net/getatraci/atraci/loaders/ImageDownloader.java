@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.loaders;
 
 import java.io.InputStream;
 

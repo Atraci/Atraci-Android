@@ -1,5 +1,6 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.activities;
 
+import net.getatraci.atraci.R;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -1,8 +1,9 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.interfaces;
 
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.activities.PlaylistSelectorFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;

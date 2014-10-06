@@ -1,5 +1,8 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.loaders;
 
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.MusicItem;
+import net.getatraci.atraci.data.MusicTypeCategories;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;

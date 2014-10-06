@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.layouthelpers;
 
 import android.os.Parcel;
 import android.os.Parcelable;

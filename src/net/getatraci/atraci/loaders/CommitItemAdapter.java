@@ -1,7 +1,9 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.loaders;
 
 import java.util.ArrayList;
 
+import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.CommitItem;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.data;
 
 public class CommitItem {
 	

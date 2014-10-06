@@ -1,4 +1,4 @@
-package net.getatraci.atraci;
+package net.getatraci.atraci.json;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -9,6 +9,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import net.getatraci.atraci.data.CommitItem;
+import net.getatraci.atraci.data.MusicItem;
+import net.getatraci.atraci.data.MusicTypeCategories;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
@@ -53,7 +57,7 @@ public class JSONParser {
 		return builder.toString();
 	}
 	
-    protected static MusicTypeCategories getListFromJsonArray(JSONArray jsonArray, int mode) {
+    public static MusicTypeCategories getListFromJsonArray(JSONArray jsonArray, int mode) {
         MusicTypeCategories lfm = new MusicTypeCategories();
         ArrayList<MusicItem> items = new ArrayList<MusicItem>();
         // fill the list
