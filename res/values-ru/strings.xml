@@ -5,17 +5,27 @@
     <string name="hello_world">Привет, мир!</string>
     <string name="action_settings">Настройки</string>
     <string name="action_search">Поиск</string>
-    <string name="seach_hint">Искать по Названию/Артисту/Альбому</string>
+    <string name="seach_hint">Искать Трек/Артиста/Альбом</string>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="menuitem_refresh">Обновить</string>
-    <string name="lyrics">Получаем текст трека!</string>
+    <string name="lyrics">Получаем тексты!</string>
     <string name="drawer_open">Atraci</string>
     <string name="drawer_close">Закрыт</string>
-    
+
     <string-array name="navigation_items">
-    <item>Топ треки</item>
-    <item>Топ 100</item>
-    <item>Мой плей-лист</item>
-</string-array>
+        <item>Домой</item>
+        <item>Популярные треки</item>
+        <item>Топ 100</item>
+        <item>Мои плей-листы</item>
+    </string-array>
+
+    <string name="play">Играть</string>
+    <string name="pause">Пауза</string>
+    <string name="backarrow">&lt;&lt;</string>
+    <string name="forwardarrow">&gt;&gt;</string>
+    <string name="title_activity_playlist_selector">PlaylistSelectorActivity</string>
+    <string name="playlists">Мои Плей-листы</string>
+    <string name="top100">Топ 100</string>
+    <string name="top_tracks">Популярные треки</string>
 
 </resources>
