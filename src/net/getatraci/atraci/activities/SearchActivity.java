@@ -68,7 +68,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 		Intent intent = new Intent(SearchActivity.this, PostSearchSongListActivity.class);
 		Bundle extras = new Bundle();
 		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"");
-		extras.putInt("type", mi.getType());
+		extras.putBoolean("isPlaylist", false);
 		intent.putExtras(extras);
 		startActivity(intent);
 	}
@@ -114,7 +114,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 					String readJSON = JSONParser.getJSON(JSONParser.LASTFM_API_URL+ q);
 					JSONObject jsonObject = new JSONObject(readJSON);
 					JSONArray array = jsonObject.getJSONObject("response").getJSONArray("docs");
-					MusicTypeCategories data = JSONParser.getListFromJsonArray(array, JSONParser.LFM);
+					MusicTypeCategories data = JSONParser.getLastFMListFromJsonArray(array);
 					Log.d("ATRACI", "Search Data: " + data.toString() + "\n\n" + q);
 					LFMArrayAdapter adapt = new LFMArrayAdapter(SearchActivity.this, data);
 					return adapt;

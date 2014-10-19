@@ -6,9 +6,11 @@
 
     <uses-sdk
         android:minSdkVersion="17"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="20" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <application
         android:allowBackup="true"
@@ -17,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".HomeActivity"
+            android:name="net.getatraci.atraci.activities.HomeActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,8 +28,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
-            android:parentActivityName=".HomeActivity" >
+            android:name="net.getatraci.atraci.activities.SearchActivity"
+            android:parentActivityName="net.getatraci.atraci.activities.HomeActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -35,22 +37,31 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
-                android:value="net.getatraci.atraci.SearchActivity" />
+                android:value="net.getatraci.atraci.activities.SearchActivity" />
                  />
         </activity>
         <activity
-            android:name=".PostSearchSongListActivity"
-            android:parentActivityName=".SearchActivity" >
+            android:name="net.getatraci.atraci.activities.PostSearchSongListActivity"
+            android:parentActivityName="net.getatraci.atraci.activities.SearchActivity" >
         </activity>
         <activity
-            android:name=".PlayerActivity"
+            android:name="net.getatraci.atraci.activities.PlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_player" >
+            android:label="@string/title_activity_player"
+            android:launchMode="singleTask" >
+            
+            
         </activity>
         <activity
-            android:name=".PlaylistSelectorFragment"
+            android:name="net.getatraci.atraci.activities.PlaylistSelectorFragment"
             android:label="@string/title_activity_playlist_selector" >
         </activity>
+        
+        <receiver android:name="net.getatraci.atraci.interfaces.RemoteControlReceiver" android:enabled="true">
+    <intent-filter android:priority="2147483647">
+        <action android:name="android.intent.action.MEDIA_BUTTON" />
+    </intent-filter>
+</receiver>
     </application>
 
 </manifest>

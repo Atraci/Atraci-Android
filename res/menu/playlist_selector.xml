@@ -3,9 +3,10 @@
     tools:context="net.getatraci.atraci.PlaylistSelectorActivity" >
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:id="@+id/action_add"
+        android:icon="@drawable/ic_action_add_to_queue"
+        android:orderInCategory="1"
+        android:showAsAction="always"
+        android:title="@string/add_playlist"/>
 
 </menu>

@@ -5,8 +5,8 @@ import android.os.Parcelable;
 
 public class MusicItem implements Parcelable {
 
-	private double weight;
-	private String image;
+	private String image_med;
+	private String image_lrg;
 	private String artist = "";
 	private String album = "";
 	private String track = "";
@@ -23,9 +23,8 @@ public class MusicItem implements Parcelable {
 		
 	}
 	
-	public MusicItem(int w, String i, String item, int type) {
-		weight = w;
-		image = i;
+	public MusicItem(String i, String item, int type) {
+		image_med = i;
 		
 		switch(type){
 		case 0:
@@ -41,17 +40,11 @@ public class MusicItem implements Parcelable {
 	}
 	
 	
-	public double getWeight() {
-		return weight;
+	public String getImage_med() {
+		return image_med;
 	}
-	public void setWeight(double weight) {
-		this.weight = weight;
-	}
-	public String getImage() {
-		return image;
-	}
-	public void setImage(String image) {
-		this.image = image;
+	public void setImage_med(String image) {
+		this.image_med = image;
 	}
 	public String getArtist() {
 		return artist;
@@ -98,8 +91,7 @@ public class MusicItem implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel arg0, int arg1) {
-		arg0.writeDouble(weight);
-		arg0.writeString(image);
+		arg0.writeString(image_med);
 		arg0.writeString(artist);
 		arg0.writeString(album);
 		arg0.writeString(track);
@@ -118,6 +110,14 @@ public class MusicItem implements Parcelable {
 	@Override
 	public String toString() {
 		return "Track: " + track + "  Album: " + album + "  Artist: " + artist;
+	}
+
+	public String getImage_lrg() {
+		return image_lrg;
+	}
+
+	public void setImage_lrg(String image_lrg) {
+		this.image_lrg = image_lrg;
 	}
 	
 }

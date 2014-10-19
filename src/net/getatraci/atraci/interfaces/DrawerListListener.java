@@ -2,7 +2,6 @@ package net.getatraci.atraci.interfaces;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.activities.PlaylistSelectorFragment;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,7 +17,6 @@ public class DrawerListListener  implements OnItemClickListener{
 	
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		Fragment sel = new PlaylistSelectorFragment();
 		FragmentManager manager = mContext.getFragmentManager();
 		manager.beginTransaction().replace(R.id.content_frame, mContext).commit();
 	}

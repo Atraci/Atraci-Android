@@ -16,7 +16,8 @@
         <item>Home</item>
         <item>Top Tracks</item>
         <item>Top 100</item>
-        <item>My Playlist</item>
+        <item>My Playlists</item>
+        <item>Donate</item>
     </string-array>
 
     <string name="play">Play</string>
@@ -27,5 +28,9 @@
     <string name="playlists">My Playlists</string>
     <string name="top100">Top 100</string>
     <string name="top_tracks">Top Tracks</string>
+    <string name="add_playlist">Add Playlist</string>
+    <string name="playlist_hint">Enter playlist name</string>
+    <string name="shuffle">Shuffle</string>
+    <string name="repeat">Repeat</string>
 
 </resources>

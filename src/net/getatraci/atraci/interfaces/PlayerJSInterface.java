@@ -1,10 +1,7 @@
 package net.getatraci.atraci.interfaces;
 
 import net.getatraci.atraci.activities.PlayerActivity;
-import android.graphics.Point;
-import android.view.Display;
 import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 public class PlayerJSInterface {
 	
@@ -16,16 +13,60 @@ public class PlayerJSInterface {
 	
 	@JavascriptInterface
 	public void onVideoComplete() {
+		player.setVideoOver(true);
 		player.skipToItemByIndexOffset(1);
-		Toast.makeText(player, "Video Over!", Toast.LENGTH_LONG).show();
+	}
+	
+	@JavascriptInterface
+	public void onVideoPaused() {
+		player.pauseVideo();
+	}
+	
+	@JavascriptInterface
+	public void onVideoUnstarted() {
+
+	}
+	
+	@JavascriptInterface
+	public void onVideoPlaying() {
+		
+	}
+	
+	@JavascriptInterface
+	public void onPlayerReady() {
+		player.playVideo();
 	}
 	
 	@JavascriptInterface
 	public int getScreenWidth() {
-		Display display = player.getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		return size.x;
+//		Display display = player.getWindowManager().getDefaultDisplay();
+//		Point size = new Point();
+//		display.getSize(size);
+//		return size.x;
+		
+		return player.getWebView().getWidth();
+	}
+	
+	@JavascriptInterface
+	public int getScreenHeight() {
+		return player.getWebView().getHeight();
+	}
+	
+	@JavascriptInterface
+	public void setSeekbarLength(int time) {
+		player.getSeekBar().setMax(time);
+		player.setTotalTimeViewTime(time);
+	}
+	
+	@JavascriptInterface
+	public void setVideoTime(int time) {
+		player.getSeekBar().setProgress(time);
+		player.setTimeViewTime(time);
+	}
+	
+	@JavascriptInterface
+	public void setTitle(String title) {
+		player.setActionBarTitle(title);
 	}
 
 }

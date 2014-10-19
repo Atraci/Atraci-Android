@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,9 +58,32 @@ public class JSONParser {
 		return builder.toString();
 	}
 	
-    public static MusicTypeCategories getListFromJsonArray(JSONArray jsonArray, int mode) {
+	
+	public static String extractYoutubeId(String url) throws MalformedURLException {
+	    String id = null;
+	    try {
+	        String query = new URL(url).getQuery();
+	        if (query != null) {
+	            String[] param = query.split("&");
+	            for (String row : param) {
+	                String[] param1 = row.split("=");
+	                if (param1[0].equals("v")) {
+	                    id = param1[1];
+	                }
+	            }
+	        } else {
+	            if (url.contains("embed")) {
+	                id = url.substring(url.lastIndexOf("/") + 1);
+	            }
+	        }
+	    } catch (Exception ex) {
+	        Log.e("Exception", ex.toString());
+	    }
+	    return id;
+	}
+	
+    public static MusicTypeCategories getLastFMListFromJsonArray(JSONArray jsonArray) {
         MusicTypeCategories lfm = new MusicTypeCategories();
-        ArrayList<MusicItem> items = new ArrayList<MusicItem>();
         // fill the list
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
@@ -69,22 +93,10 @@ public class JSONParser {
                 Iterator<?> iter = jo.keys();
                 while(iter.hasNext()) {
                     String currentKey = (String) iter.next();
-                    switch(mode){
-                    case ATRACI:
-                    	parseATRACI(currentKey, jo, lfi);
-                    	break;
-                    case LFM:
                     	parseLFM(currentKey, jo, lfi);
-                    	break;
-                    }
-
                 }
 
                 lfi.setType();
-
-                //                if(mode == ATRACI) {
-                //                	parseYoutube(lfi, lfi.getTrack() + " - " + lfi.getArtist());
-                //                }
 
                 switch(lfi.getType()) {
 	                case MusicItem.TRACK:
@@ -97,21 +109,40 @@ public class JSONParser {
 	                	lfm.addArtist(lfi);
 	                	break;
                 }
+            } catch (JSONException e) {
+                Log.e("JSON", e.getLocalizedMessage());
+            }
+        }
+        return lfm;
+    }
+    
+    public static ArrayList<MusicItem> getSongListFromJsonArray(JSONArray jsonArray) {
+        ArrayList<MusicItem> items = new ArrayList<MusicItem>();
+        // fill the list
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+            	MusicItem lfi = new MusicItem();
+                JSONObject jo = (JSONObject) jsonArray.get(i);
+                // fill map
+                Iterator<?> iter = jo.keys();
+                while(iter.hasNext()) {
+                    String currentKey = (String) iter.next();
+                    	parseATRACI(currentKey, jo, lfi);
+                }
+
+                lfi.setType();
                 
-                if(lfi.getImage() != null )
                 	items.add(lfi);
             } catch (JSONException e) {
                 Log.e("JSON", e.getLocalizedMessage());
             }
         }
-        Log.d("ATRACI", lfm.toString());
-        return lfm;
+        return items;
     }
     
     public static String getLyrics(String artist, String song) {
     	String lyrics = "";
     	String query = String.format(JSONParser.LYRICS_WIKIA_API_URL, artist.replaceAll(" ", "_"), song.replaceAll(" ", "_"));
-		Log.d("ATRACI", query);
 		try {
 			String json = JSONParser.getJSON(query);
 			JSONObject jsonObject = new JSONObject(json);
@@ -144,35 +175,47 @@ public class JSONParser {
     }
     
     private static void parseLFM(String currentKey, JSONObject jo, MusicItem lfi) throws JSONException {
-        if(currentKey.equals("track"))
+        if(currentKey.equals("track")) {
         	lfi.setTrack(jo.getString(currentKey));
-        else if(currentKey.equals("album"))
+        }
+        else if(currentKey.equals("album")) {
         	lfi.setAlbum(jo.getString(currentKey));
-        else if(currentKey.equals("artist"))
+        }
+        else if(currentKey.equals("artist")) {
         	lfi.setArtist(jo.getString(currentKey));
-        else if(currentKey.equals("weight"))
-        	lfi.setWeight(jo.getDouble(currentKey));
-        else if(currentKey.equals("image"))
-        	lfi.setImage("http://userserve-ak.last.fm/serve/34s/"+""+jo.getString(currentKey));
+        }
+        else if(currentKey.equals("image")) {
+        	lfi.setImage_med("http://userserve-ak.last.fm/serve/34s/"+""+jo.getString(currentKey));
+        	lfi.setImage_lrg("http://userserve-ak.last.fm/serve/64/"+""+jo.getString(currentKey));
+        }
     }
     
     private static void parseATRACI(String currentKey, JSONObject jo, MusicItem lfi) throws JSONException {
-        if(currentKey.equals("title"))
+        if(currentKey.equals("title")) {
         	lfi.setTrack(jo.getString(currentKey));
-        else if(currentKey.equals("artist"))
+        	return;
+        }
+        if(currentKey.equals("artist")) {
         	lfi.setArtist(jo.getString(currentKey));
-        else if(currentKey.equals("cover_url_medium"))
-        	lfi.setImage(jo.getString(currentKey));
+        	return;
+        }
+        if(currentKey.equals("cover_url_large")) {
+        	lfi.setImage_lrg(jo.getString(currentKey));
+        	return;
+        }
+        if(currentKey.equals("cover_url_medium")) {
+        	lfi.setImage_med(jo.getString(currentKey));
+        	return;
+        }
     }
     
-    public static String parseYoutubeRTSP( String q) throws JSONException {
+    public static String parseYoutubeRTSP(String q) throws JSONException {
     	try {
     		q = q.replaceAll(" ", "%20");
 			String json = getJSON(YOUTUBE_API_URL_RTSP+q);
 			JSONObject ja = new JSONObject(json).getJSONObject("feed").getJSONArray("entry").getJSONObject(0).getJSONObject("media$group");
 
 			String link = ja.getJSONArray("media$content").getJSONObject(2).getString("url");
-			Log.d("ATRACI", link);
 			return link;
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -188,7 +231,6 @@ public class JSONParser {
 			JSONArray ja = new JSONObject(json).getJSONObject("feed").getJSONArray("entry").getJSONObject(0).getJSONArray("link");
 
 			String link = ja.getJSONObject(0).getString("href");
-			Log.d("ATRACI", link);
 			return link;
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block

@@ -1,10 +1,10 @@
 package net.getatraci.atraci.loaders;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
-import net.getatraci.atraci.data.MusicTypeCategories;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,20 +16,20 @@ import android.widget.TextView;
 public class SongListAdapter extends BaseAdapter {
 	
     private LayoutInflater inflater;
-    private MusicTypeCategories items;
+    private ArrayList<MusicItem> items;
     
     int cnt;
-    public SongListAdapter(Context c, MusicTypeCategories arr) {
+    public SongListAdapter(Context c, ArrayList<MusicItem> arr) {
         inflater = LayoutInflater.from(c);
         this.items = arr;
     }
 
     public int getCount() {
-        return items.getSongCount();
+        return items.size();
     }
 
     public MusicItem getItem(int position) {
-        return items.getSong(position);
+        return items.get(position);
     }
 
     public long getItemId(int position) {
@@ -56,12 +56,12 @@ public class SongListAdapter extends BaseAdapter {
 
         
 		try {
-			new ImageDownloader(picture, items.getSong(i).getImage()).get();
+			new ImageDownloader(picture, items.get(i).getImage_med()).get();
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        name.setText(items.getSong(i).getTrack()+"\n"+items.getSong(i).getArtist());
+        name.setText(items.get(i).getTrack()+"\n"+items.get(i).getArtist());
 
         return v;
     }

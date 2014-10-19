@@ -114,16 +114,16 @@ public class LFMArrayAdapter extends BaseAdapter {
         switch(type) {
         case TYPE_SONG:
         	
-			new ImageDownloader(img,m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getImage());
+			new ImageDownloader(img,m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getImage_med());
 //        	txt.setText(m_data.getSong(Math.abs(position - m_data.getAlbumCount()- m_data.getArtistCount()-3)).getTrack());
 			txt.setText(m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getTrack());
         	break;
         case TYPE_ALBUM:
-        	new ImageDownloader(img,m_data.getAlbum(position-(m_data.getArtistCount()+2)).getImage());
+        	new ImageDownloader(img,m_data.getAlbum(position-(m_data.getArtistCount()+2)).getImage_med());
         	txt.setText(m_data.getAlbum(position-m_data.getArtistCount()-2).getAlbum());
         	break;
         case TYPE_ARTIST:
-        	new ImageDownloader(img,m_data.getArtist(position-1).getImage());
+        	new ImageDownloader(img,m_data.getArtist(position-1).getImage_med());
         	txt.setText(m_data.getArtist(position-1).getArtist());
         	break;
         }

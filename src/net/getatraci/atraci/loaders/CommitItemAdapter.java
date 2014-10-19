@@ -45,9 +45,7 @@ public class CommitItemAdapter extends BaseAdapter {
         }
         
         TextView tv = (TextView) view.findViewById(R.id.commit_message);
-        tv.setText(items.get(position).getMessage());
-        Log.d("ATRACI", items.size() + " | " + items.get(position).getMessage());
-        
+        tv.setText(items.get(position).getMessage());        
 		return view;
 	}
 
