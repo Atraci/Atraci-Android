@@ -3,14 +3,14 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
     android:paddingLeft="32dp" >
 
 
         <ImageView
             android:id="@+id/album_art"
-            android:layout_width="25dp"
+            android:layout_width="35dp"
             android:contentDescription="@+string/album_thumbnail"
             android:layout_height="25dp"
             android:layout_gravity="left" />

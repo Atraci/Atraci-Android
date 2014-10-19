@@ -21,36 +21,97 @@
         android:layout_margin="12dip" />
 
     <LinearLayout
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal" >
 
-        <Button
+        <SeekBar
+            android:id="@+id/player_seekbar"
+            android:layout_width="275dp"
+            android:layout_height="fill_parent" >
+        </SeekBar>
+
+        <TextView
+            android:id="@+id/play_time"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
+            android:gravity="right" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_time"
+            android:layout_width="35dp"
+            android:layout_height="match_parent"
+            android:gravity="right" >
+        </TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light" >
+
+        <ImageButton
+            android:id="@+id/repeatbut"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/repeat"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:src="@drawable/ic_action_repeat_off"
+            android:text="@string/repeat" />
+
+        <ImageButton
             android:id="@+id/prevbut"
             style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/backarrow"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:src="@drawable/ic_action_previous"
             android:text="@string/backarrow" />
 
-        <Button
+        <ImageButton
             android:id="@+id/playbut"
             style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/pause"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:src="@drawable/ic_action_play"
             android:text="@string/pause" />
 
-        <Button
+        <ImageButton
             android:id="@+id/nextbut"
             style="?android:attr/buttonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/forwardarrow"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:src="@drawable/ic_action_next"
             android:text="@string/forwardarrow" />
+
+        <ImageButton
+            android:id="@+id/shufflebut"
+            style="?android:attr/buttonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/shuffle"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:src="@drawable/ic_action_shuffle_off"
+            android:text="@string/shuffle" />
     </LinearLayout>
 
     <TextView

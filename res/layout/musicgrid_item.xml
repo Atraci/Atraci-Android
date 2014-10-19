@@ -2,12 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <net.getatraci.atraci.MusicItemView
+    
+    <net.getatraci.atraci.layouthelpers.AlbumArtImage
         android:id="@+id/picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
+        android:paddingLeft="13dp"
+        android:paddingRight="13dp"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
         android:scaleType="centerCrop"
