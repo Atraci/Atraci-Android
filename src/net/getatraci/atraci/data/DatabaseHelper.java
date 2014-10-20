@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Atraci";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
 	
     private static final String TABLE_PLAYLISTS = "playlists";
     private static final String TABLE_SONGS = "songs";
@@ -26,12 +26,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String SONGS_TITLE = "title";
     private static final String SONGS_COVER_LARGE = "cover_large";
     private static final String SONGS_COVER_MED = "cover_med";
+    private static final String SONGS_TIME_ADDED = "time_added";
     
     //Table creation strings
     private static final String CREATE_TABLE_PLAYLISTS = "CREATE TABLE " 
     										+ TABLE_PLAYLISTS + "("
     										+ KEY_ID + " INTEGER PRIMARY KEY,"
-    										+ PLAYLISTS_NAME + " TEXT,"
+    										+ PLAYLISTS_NAME + " TEXT UNIQUE,"
     										 + "FOREIGN KEY("+ KEY_ID + ") REFERENCES "+ TABLE_SONGS +"("+ KEY_ID +  "));";
     private static final String CREATE_TABLE_SONGS = "CREATE TABLE " 
     										+ TABLE_SONGS + "(" 
@@ -40,7 +41,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     										+ SONGS_ARTIST + " TEXT," 
     										+ SONGS_TITLE + " TEXT,"
     										+ SONGS_COVER_LARGE + " TEXT,"
-    										+ SONGS_COVER_MED + " TEXT"
+    										+ SONGS_COVER_MED + " TEXT,"
+    										+ SONGS_TIME_ADDED + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
     										+/* "FOREIGN KEY("+ KEY_ID + ") REFERENCES "+ TABLE_PLAYLISTS +"("+ KEY_ID +  ")*/");";
 
     public DatabaseHelper(Context context) {
@@ -76,6 +78,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.delete(TABLE_SONGS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
 		db.delete(TABLE_PLAYLISTS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
+	}
+	
+	public int deleteSongFromPlaylistByLink(String id, String title) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		return db.delete(TABLE_SONGS, SONGS_TITLE + " = ? AND " + KEY_ID + " = ?", new String[]{title, id});
 	}
 	
 	public Playlists getPlaylistByName(String playlist_name) {
@@ -131,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public ArrayList<MusicItem> getSongsFromPlaylist(int id) {
 		ArrayList<MusicItem> playlists = new ArrayList<MusicItem>();
 		SQLiteDatabase db = this.getReadableDatabase();
-		String query = "SELECT * FROM " + TABLE_SONGS + " WHERE " + KEY_ID + " = ?";
+		String query = "SELECT * FROM " + TABLE_SONGS + " WHERE " + KEY_ID + " = ? ORDER BY " + SONGS_TIME_ADDED;
 		
 		Cursor c = db.rawQuery(query, new String[]{Integer.toString(id)});
 		if(!c.moveToFirst()) {
