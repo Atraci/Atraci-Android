@@ -201,10 +201,13 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 
 	@Override
 	public boolean onQueryTextSubmit(String query) {
-		Bundle bundle = new Bundle();
 		String text = query.replaceAll(" ", "%20");
+		Intent intent = new Intent(SearchActivity.this, PostSearchSongListActivity.class);
+		Bundle bundle = new Bundle();
 		bundle.putString("query", text);
-		getLoaderManager().restartLoader(LID_LFM, bundle, SearchActivity.this);
+		bundle.putBoolean("isPlaylist", false);
+		intent.putExtras(bundle);
+		startActivity(intent);
 		return true;
 	}
 }

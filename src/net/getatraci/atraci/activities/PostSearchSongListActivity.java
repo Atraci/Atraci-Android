@@ -28,6 +28,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -49,6 +51,8 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	private ProgressDialog progress;
 	private ArrayList<MusicItem> results;
 	private boolean isPlaylist;
+	private int playlistID;
+	private String playlistName;
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
@@ -75,7 +79,9 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		m_gridview.setOnItemLongClickListener(this);
 		
 		if(isPlaylist) {
-			actionBar.setTitle("Playlist: "+((Playlists)HomeActivity.getDatabase().getPlaylistByID(Integer.parseInt(bundle.getString("query")))).getName());
+			playlistID = Integer.parseInt(bundle.getString("query"));
+			playlistName = HomeActivity.getDatabase().getPlaylistByID(playlistID).getName();
+			actionBar.setTitle("Playlist: " + playlistName);
 		}
 	}
 
@@ -100,7 +106,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 						JSONArray jsonArray = new JSONArray(readJSON);
 						results = JSONParser.getSongListFromJsonArray(jsonArray);
 					} else {
-						results = HomeActivity.getDatabase().getSongsFromPlaylist(Integer.parseInt(bundle.getString("query")));
+						results = HomeActivity.getDatabase().getSongsFromPlaylist(playlistID);
 						HomeActivity.getDatabase().closeConnection();
 					}
 					return new SongListAdapter(PostSearchSongListActivity.this, results);
@@ -170,7 +176,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		m_gridview.setAdapter(adapter);
 		setProgressBarIndeterminateVisibility(false); 
 		if(m_gridview.getAdapter().getCount() == 0) {
-			Toast.makeText(PostSearchSongListActivity.this, "There are no songs in this playlist! To add one, search for some music, then long-press the song you wish to add!", Toast.LENGTH_LONG).show();
+			Toast.makeText(PostSearchSongListActivity.this, "There are no songs to show!", Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -193,6 +199,14 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view,
 			int position, long id) {
+		
+        Animation animationY = new ScaleAnimation(1,(float)0.5, 1,(float)0.5, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+        animationY.setDuration(700);
+        animationY.setFillEnabled(true);
+        animationY.setFillAfter(true);
+        view.startAnimation(animationY);  
+        
+        animationY = null;
 		ArrayList<Playlists> plists = HomeActivity.getDatabase().getAllPlaylists();
 		String[] names = new String[plists.size()];
 		
@@ -204,24 +218,78 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		for(int i = 0; i < plists.size(); i++) {
 			names[i] = plists.get(i).getName();
 		}
-		Dialog dialog = createPlaylistDialog(names, (MusicItem)m_gridview.getAdapter().getItem(position));
-		dialog.show();
+		
+		Dialog dialog;
+		
+		if(!isPlaylist) {
+			dialog = createPlaylistDialog(names, (MusicItem)m_gridview.getAdapter().getItem(position), view);
+			dialog.show();
+			
+		} else {
+			dialog = createDeleteDialog(Integer.toString(playlistID), (MusicItem)m_gridview.getAdapter().getItem(position), view);
+			dialog.show();
+		}
 		return true;
 	}
 
-	public Dialog createPlaylistDialog(final String[] playlists, final MusicItem item) {
+	public Dialog createPlaylistDialog(final String[] playlists, final MusicItem item, final View view) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Add to Playlist:");
 		builder.setItems(playlists, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int pos) {
 				boolean result = HomeActivity.getDatabase().addSongToPlaylist(playlists[pos], item);
-				
+	            Animation animationY = new ScaleAnimation((float)0.5, 1, (float)0.5, 1, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+	            animationY.setDuration(700);
+	            animationY.setFillEnabled(true);
+	            animationY.setFillAfter(true);
+	            view.startAnimation(animationY);  
+	            animationY = null;
+	            
 				if(!result) {
 					Toast.makeText(PostSearchSongListActivity.this, "This song already exists in the playlist!", Toast.LENGTH_LONG).show();
+				} else {
+					Toast.makeText(PostSearchSongListActivity.this, "Song added to " + playlists[pos] + " playlist!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
 		return builder.create();
 	}
+	
+	public Dialog createDeleteDialog(final String pname, final MusicItem item, final View view) {
+		final Loader<SongListAdapter> loader = getLoaderManager().getLoader(LID_PSSLA);
+	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    builder.setTitle("Are you sure?");
+	    builder.setMessage("Delete " + item.getTrack() + "?");
+	    builder.setIcon(android.R.drawable.ic_dialog_alert);
+	    builder.setPositiveButton("Do It!", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+	        	Log.d("ATRACI", item.getYoutube());
+	            int result = HomeActivity.getDatabase().deleteSongFromPlaylistByLink(pname, item.getTrack());
+	            if(result > 0) {
+	            	Toast.makeText(PostSearchSongListActivity.this, "Song deleted successfully!", Toast.LENGTH_SHORT).show();
+	                Animation animationY = new ScaleAnimation((float)0.5,0, (float)0.5, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+	                animationY.setDuration(700);
+	                animationY.setFillEnabled(true);
+	                animationY.setFillAfter(true);
+	                view.startAnimation(animationY);  
+	                animationY = null;
+	            	loader.forceLoad();
+	            } else {
+	            	Toast.makeText(PostSearchSongListActivity.this, "There was an unknown error while deleting the song :(", Toast.LENGTH_LONG).show();
+	            }
+	      } });
+	    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int which) {
+	            Animation animationY = new ScaleAnimation((float)0.5, 1, (float)0.5, 1, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+	            animationY.setDuration(700);
+	            animationY.setFillEnabled(true);
+	            animationY.setFillAfter(true);
+	            view.startAnimation(animationY);  
+	            animationY = null;
+	            finish();
+	      } });
+	    return builder.create();
+	}
+	
 
 }

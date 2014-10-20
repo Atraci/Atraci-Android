@@ -10,10 +10,11 @@
 
         <ImageView
             android:id="@+id/album_art"
-            android:layout_width="35dp"
+            android:layout_width="32dp"
             android:contentDescription="@+string/album_thumbnail"
-            android:layout_height="25dp"
-            android:layout_gravity="left" />
+            android:layout_height="32dp"
+            android:layout_gravity="left"
+            android:background="#000000" />
 
         <TextView
             android:id="@+id/item1"

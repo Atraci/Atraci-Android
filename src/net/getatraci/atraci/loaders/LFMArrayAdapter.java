@@ -4,10 +4,13 @@ import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.data.MusicTypeCategories;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,7 +20,7 @@ public class LFMArrayAdapter extends BaseAdapter {
 
 	private MusicTypeCategories m_data;
 	LayoutInflater layoutInflater;
-	Context m_Context;
+	Context mContext;
 	
 	private final int TYPE_ARTIST_HEADER = 0;
 	private final int TYPE_ARTIST = 1;
@@ -28,7 +31,7 @@ public class LFMArrayAdapter extends BaseAdapter {
 	
     public LFMArrayAdapter(Context context, MusicTypeCategories data) {
       super();
-      m_Context = context;
+      mContext = context;
       m_data = data;
       layoutInflater = LayoutInflater.from(context);
     }
@@ -94,6 +97,7 @@ public class LFMArrayAdapter extends BaseAdapter {
 		if(type == TYPE_ARTIST_HEADER || type == TYPE_ALBUM_HEADER || type == TYPE_SONG_HEADER) {
 			if(convertView == null) {
 				convertView = getHeaderView();
+				convertView.setBackgroundResource(android.R.color.background_dark);
 			}
 			String text = type == TYPE_ARTIST_HEADER ? "Artists" : type == TYPE_ALBUM_HEADER ? "Albums" : "Songs";
 			((TextView) ((ViewGroup) convertView).getChildAt(0)).setText(text);
@@ -130,14 +134,24 @@ public class LFMArrayAdapter extends BaseAdapter {
 		} catch (Exception e) {
 			Log.e("ATRACI", ""+e.getMessage(), e);
 			return convertView;
-		}
+		} 
+		
+		
+        Animation animationY = new ScaleAnimation(0, 1, 1, 1, Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0);
+        animationY.setDuration(700);
+        convertView.startAnimation(animationY);  
+        animationY = null;
 		
 		return convertView;
 	}
 	
 	private ViewGroup getHeaderView() {
-		LinearLayout layout = new LinearLayout(m_Context);
-		layout.addView(new TextView(m_Context));
+		LinearLayout layout = new LinearLayout(mContext);
+		TextView tv = new TextView(mContext);
+		tv.setBackgroundResource(android.R.color.background_dark);
+		tv.setTextColor(Color.WHITE);
+		tv.setShadowLayer(1, 0, 0, Color.BLACK);
+		layout.addView(tv);
 		return layout;
 	}
 	

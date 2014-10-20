@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    
+    android:layout_height="match_parent" >
+
     <net.getatraci.atraci.layouthelpers.AlbumArtImage
         android:id="@+id/picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/play"
+        android:paddingBottom="20dp"
         android:paddingLeft="13dp"
         android:paddingRight="13dp"
         android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:scaleType="centerCrop"
-        />
-    
+        android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#55000000"
+        android:paddingBottom="15dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:layout_gravity="bottom"
-        android:textColor="@android:color/white"
-        android:background="#55000000"
         android:scaleX="0.89"
         android:scaleY="0.8"
-        />
-            <ImageView
+        android:textColor="@android:color/white" />
+
+    <ImageView
         android:id="@+id/play_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/ic_action_play_over_video"
+        android:contentDescription="@string/play"
         android:scaleX="1.5"
-        android:scaleY="1.5" />
+        android:scaleY="1.5"
+        android:src="@drawable/ic_action_play_over_video" />
 
 </FrameLayout>

@@ -11,6 +11,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.Loader;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -34,21 +36,21 @@ import android.widget.Toast;
  *
  */
 
-public class PlaylistSelectorFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, OnFocusChangeListener, LoaderCallbacks<PlaylistListAdapter> {
+public class PlaylistSelectorFragment extends Fragment implements OnKeyListener, OnClickListener, OnItemClickListener, OnItemLongClickListener, OnFocusChangeListener, LoaderCallbacks<PlaylistListAdapter> {
 
 	private Menu mMenu;
 	private DatabaseHelper database;
 	private ListView list;
 	View.OnTouchListener gestureListener;
-	
+
 	static class ViewHolder {
 		public TextView text;
 	}
-	
+
 	public PlaylistSelectorFragment(DatabaseHelper db) {
 		database = db;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,22 +67,18 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 		list.setOnItemClickListener(this);
 		return v;
 	}
-	
+
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		inflater.inflate(R.menu.playlist_selector, menu);
 		menu.removeItem(R.id.action_search);
 		mMenu = menu;
-		//menu.getItem(0).setIcon(R.drawable.ic_action_new);
 	}
-	
+
 	/* Listener for navbar items like search and drawer */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_add) {
 			openTextField();
@@ -88,21 +86,29 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	public void openTextField() {
 		getActivity().getActionBar().setTitle("");
 		mMenu.findItem(R.id.action_add).setActionView(R.layout.menu_textngo);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_button).setOnClickListener(this);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnFocusChangeListener(this);
+		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnKeyListener(this);
 		getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 	}
 
 	@Override
 	public void onClick(View v) {
 		String s = ((EditText)mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field)).getText().toString();
-		database.createPlaylist(s);
+		long result = database.createPlaylist(s);
+		if(result > 0) {
 		getLoaderManager().getLoader(111).forceLoad();
 		list.requestFocus();
+		getActivity().getActionBar().setTitle(R.string.playlists);
+		mMenu.findItem(R.id.action_add).setActionView(null);
+		getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+		} else {
+			Toast.makeText(getActivity(), "That playlist already exists! Please choose a different name!", Toast.LENGTH_LONG).show();
+		}
 	}
 
 	@Override
@@ -113,17 +119,17 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 			getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		}		
 	}
-	
+
 	public Loader<PlaylistListAdapter> onCreateLoader(int id, Bundle bundle) {
 		return new AsyncTaskLoader<PlaylistListAdapter>(getActivity()){
 			PlaylistListAdapter data;
-			
+
 			@Override
 			public PlaylistListAdapter loadInBackground() {
 				ArrayList<Playlists> data = database.getAllPlaylists();
 				return new PlaylistListAdapter(getActivity(), data);
 			}
-			
+
 
 			@Override
 			public void deliverResult(PlaylistListAdapter data) {
@@ -142,13 +148,13 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 					forceLoad();
 				}
 			}
-			
+
 			@Override
 			protected void onStopLoading() {
 				//Attempt to cancel the current load task, if possible.
 				cancelLoad();
 			}
-			
+
 			@Override
 			protected void onReset() {
 				super.onReset();
@@ -156,22 +162,22 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 				onStopLoading();
 				data = null;
 			}
-			
+
 		};
-	
-}
+
+	}
 
 	@Override
 	public void onLoadFinished(Loader<PlaylistListAdapter> loader,
 			PlaylistListAdapter adapter) {
-		
+
 		if(adapter.getCount() == 0) {
 			Toast.makeText(getActivity(), "No playlists found!", Toast.LENGTH_LONG).show();
 			list.setAdapter(new PlaylistListAdapter(getActivity(), new ArrayList<Playlists>()));
 		} else {
 			list.setAdapter(adapter);
 		}
-		
+
 	}
 
 	@Override
@@ -195,5 +201,16 @@ public class PlaylistSelectorFragment extends Fragment implements OnClickListene
 		Playlists plist = ((Playlists)list.getAdapter().getItem(position));
 		Toast.makeText(getActivity(), "Loading "+ plist.getName() + " playlist", Toast.LENGTH_LONG).show();
 		PostSearchSongListActivity.fireIntent(getActivity(), Integer.toString(plist.getId()), true);
+	}
+
+	@Override
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
+		if(event.getAction()==KeyEvent.ACTION_UP && keyCode==KeyEvent.KEYCODE_ENTER){
+			onClick(null);
+			return true;
+
+		}else {
+			return false;
+		}
 	}
 }
