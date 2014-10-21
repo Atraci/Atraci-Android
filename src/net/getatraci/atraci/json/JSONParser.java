@@ -41,6 +41,8 @@ public class JSONParser {
 		
 		try{
 		HttpURLConnection urlConnection = (HttpURLConnection) new URL(address).openConnection();
+		urlConnection.setRequestMethod("GET");
+		urlConnection.connect();
 		InputStream is = new BufferedInputStream(urlConnection.getInputStream());
 		if(urlConnection.getResponseCode() != 200)
 			throw new Throwable("The server did not respond as expected! Please try again later.");
@@ -48,9 +50,10 @@ public class JSONParser {
 				is, "iso-8859-1"), 8);
 		String line = null;
 		while ((line = reader.readLine()) != null) {
-			builder.append(line + "n");
+			builder.append(line + "\n");
 		}
 		is.close();
+		urlConnection.disconnect();
 		}catch(ClientProtocolException e){
 			e.printStackTrace();
 		} catch (IOException e){
@@ -137,6 +140,27 @@ public class JSONParser {
             } catch (JSONException e) {
                 Log.e("JSON", e.getLocalizedMessage());
             }
+        }
+        return items;
+    }
+    
+    public static ArrayList<MusicItem> getTop100FromJsonArray(JSONArray jsonArray) {
+        ArrayList<MusicItem> items = new ArrayList<MusicItem>();
+        // fill the list
+        for (int i = 0; i < jsonArray.length(); i++) {
+            	MusicItem lfi = new MusicItem();
+            	try {
+					lfi.setTrack(jsonArray.getJSONObject(i).getJSONObject("im:name").getString("label"));
+					lfi.setImage_med(jsonArray.getJSONObject(i).getJSONArray("im:image").getJSONObject(1).getString("label"));
+					lfi.setImage_lrg(jsonArray.getJSONObject(i).getJSONArray("im:image").getJSONObject(2).getString("label"));
+					lfi.setArtist(jsonArray.getJSONObject(i).getJSONObject("im:artist").getString("label"));
+					lfi.setAlbum(jsonArray.getJSONObject(i).getJSONObject("im:collection").getJSONObject("im:name").getString("label"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	items.add(lfi);
+            
         }
         return items;
     }

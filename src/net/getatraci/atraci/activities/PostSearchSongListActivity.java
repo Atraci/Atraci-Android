@@ -10,13 +10,13 @@ import net.getatraci.atraci.loaders.SongListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.app.ProgressDialog;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,11 +48,11 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 
 	GridView m_gridview;
 	private static final int LID_PSSLA = 1;
-	private ProgressDialog progress;
 	private ArrayList<MusicItem> results;
 	private boolean isPlaylist;
 	private int playlistID;
 	private String playlistName;
+	public static final String QUERY_TOP100= "Top 100 Songs";
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
@@ -71,9 +71,6 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		isPlaylist = bundle.getBoolean("isPlaylist");
 		actionBar.setTitle(bundle.getString("query"));
 		m_gridview = (GridView) findViewById(R.id.gridview);
-		progress = new ProgressDialog(this);
-		progress.setTitle("Loading...");
-		progress.setMessage("Loading tracks...\nPlease Wait!");
 		getLoaderManager().initLoader(LID_PSSLA, bundle, this);
 		m_gridview.setOnItemClickListener(this);
 		m_gridview.setOnItemLongClickListener(this);
@@ -101,7 +98,12 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 			@Override
 			public SongListAdapter loadInBackground() {
 				try {
-					if(!isPlaylist) { //Load JSON if this is not a playlist 
+					if(bundle.getString("query").equals(QUERY_TOP100)) {
+						String json = JSONParser.getJSON(JSONParser.TOP_100_LIST_URL);
+						JSONObject obj = new JSONObject(json);
+						JSONArray array = obj.getJSONObject("feed").getJSONArray("entry");
+						results = JSONParser.getTop100FromJsonArray(array);
+					} else if(!isPlaylist) { //Load JSON if this is not a playlist 
 						String readJSON = JSONParser.getJSON(q);
 						JSONArray jsonArray = new JSONArray(readJSON);
 						results = JSONParser.getSongListFromJsonArray(jsonArray);

@@ -131,8 +131,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 			getActionBar().setTitle(getResources().getString(R.string.top_tracks));
 			break;
 		case 2:		// Top 100 tracks item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment(database)).commit();
-			getActionBar().setTitle(getResources().getString(R.string.top100));
+			launchTop100();
 			break;
 		case 3:		// Playlists items clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment(database)).commit();
@@ -144,6 +143,15 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		// Since an item was clicked, we want to move it out of the way and bring focus to user selection
 		mDrawerLayout.closeDrawer(mDrawerList);
 
+	}
+	
+	private void launchTop100() {
+		Intent intent = new Intent(this, PostSearchSongListActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("query", PostSearchSongListActivity.QUERY_TOP100);
+		bundle.putBoolean("isPlaylist", false);
+		intent.putExtras(bundle);
+		startActivity(intent);
 	}
 
 	public static DatabaseHelper getDatabase() {
