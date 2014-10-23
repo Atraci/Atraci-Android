@@ -1,12 +1,16 @@
 package net.getatraci.atraci.activities;
 
+import java.util.ArrayList;
+
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.DatabaseHelper;
+import net.getatraci.atraci.loaders.PagerFragmentAdapter;
 import android.app.Activity;
-import android.content.Intent;
+import android.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +34,33 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	private ListView mDrawerList;					 //View that holds the navigation drawer
 	private ActionBarDrawerToggle mDrawerToggle;  	 //Toggle on App Icon to open nav drawer
 	private static DatabaseHelper database;
+	public static ViewPager pager;
+	static PagerFragmentAdapter pageAdapter;
+	RootFragment news;
+	static PlayerActivity player;
+	SearchActivity search;
+	PlaylistSelectorFragment playlists;
+	SongListActivity songlist;
+	ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-
+		
+		news = new RootFragment();
+		player = new PlayerActivity();
+		songlist = new SongListActivity();
+		search = new SearchActivity(songlist);
+		
+		//Array order
+		fragments.add(news);
+		fragments.add(player);
+		
+		pager = (ViewPager)findViewById(R.id.content_frame);
+		pageAdapter = new PagerFragmentAdapter(this.getFragmentManager(), fragments);
+		pager.setAdapter(pageAdapter);
+	
 		database = new DatabaseHelper(this.getApplicationContext());
 		mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -64,7 +89,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		// Allow user to tap the appicon
 		getActionBar().setHomeButtonEnabled(true);
 		//Show the news fragment
-		this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeNewsFragment()).commit();
 	}
 
 	/* Called after the activity has been created */
@@ -114,28 +138,34 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	/* Function that starts the Seaching activity */
 	private void openSearch() {
-		Intent i = new Intent(this, SearchActivity.class);
-		startActivity(i);
+		pager.setCurrentItem(0);
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, search).addToBackStack(null).commit();
 	}
 
 	/* Listener for when user clicks an item in the Navigation Drawer */
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to use the root fragment
 		switch(position) {
 		case 0:		// Home item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new HomeNewsFragment()).commit();
+			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();
 			getActionBar().setTitle(getResources().getString(R.string.app_name));
 			break;
-		case 1:		//Top Tracks item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment(database)).commit();
-			getActionBar().setTitle(getResources().getString(R.string.top_tracks));
-			break;
-		case 2:		// Top 100 tracks item clicked
+		case 1:		// Top 100 tracks item clicked
 			launchTop100();
 			break;
-		case 3:		// Playlists items clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.content_frame, new PlaylistSelectorFragment(database)).commit();
+		case 2:		// Playlists items clicked
+			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new PlaylistSelectorFragment(database)).addToBackStack("playlists").commit();
 			getActionBar().setTitle(getResources().getString(R.string.playlists));
+			break;
+		case 3:		//Now playing item clicked
+			pager.setCurrentItem(1);
+			break;	
+		case 4:		//Donate item clicked
+			break;
+
+		case 5:		//Settings item clicked
+			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment()).addToBackStack(null).commit();
 			break;
 		}
 		// Set which item was selected in the nav drawer
@@ -146,12 +176,23 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	}
 	
 	private void launchTop100() {
-		Intent intent = new Intent(this, PostSearchSongListActivity.class);
 		Bundle bundle = new Bundle();
-		bundle.putString("query", PostSearchSongListActivity.QUERY_TOP100);
+		bundle.putString("query", SongListActivity.QUERY_TOP100);
 		bundle.putBoolean("isPlaylist", false);
-		intent.putExtras(bundle);
-		startActivity(intent);
+		if(songlist.getActivity() == null){
+			songlist.setArguments(bundle);
+		} else {
+			songlist.setBundle(bundle);
+		}
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).commit();
+	}
+	
+	public ViewPager getPager() {
+		return pager;
+	}
+	
+	public ArrayList<Fragment> getFragments() {
+		return fragments;
 	}
 
 	public static DatabaseHelper getDatabase() {

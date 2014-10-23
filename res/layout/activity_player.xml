@@ -114,8 +114,8 @@
             android:text="@string/shuffle" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/lyrics_box"
+    <ListView
+        android:id="@+id/queue_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="@string/lyrics" />

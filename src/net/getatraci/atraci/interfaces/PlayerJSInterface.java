@@ -1,6 +1,8 @@
 package net.getatraci.atraci.interfaces;
 
 import net.getatraci.atraci.activities.PlayerActivity;
+import android.graphics.Point;
+import android.view.Display;
 import android.webkit.JavascriptInterface;
 
 public class PlayerJSInterface {
@@ -39,12 +41,12 @@ public class PlayerJSInterface {
 	
 	@JavascriptInterface
 	public int getScreenWidth() {
-//		Display display = player.getWindowManager().getDefaultDisplay();
-//		Point size = new Point();
-//		display.getSize(size);
-//		return size.x;
+		Display display = player.getActivity().getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		return size.x;
 		
-		return player.getWebView().getWidth();
+		//return player.getWebView().getWidth();
 	}
 	
 	@JavascriptInterface

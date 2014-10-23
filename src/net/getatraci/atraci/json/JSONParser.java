@@ -189,7 +189,7 @@ public class JSONParser {
 				JSONObject jo = array.getJSONObject(i).getJSONObject("commit");
 				CommitItem ci = new CommitItem();
 				String s = jo.getString("message");
-				ci.setMessage(s.substring(0,(s.length() < 80 ? s.length() : 80)));
+				ci.setMessage(s);
 				commits.add(ci);
 			}
 		} catch (Throwable e) {

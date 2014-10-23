@@ -13,18 +13,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
-import android.app.Activity;
+import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -32,99 +33,112 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
-public class SearchActivity extends Activity implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener {
+public class SearchActivity extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener {
 
 	private ListView list;
 	private Timer timer = new Timer();
 	private final long SEARCH_TRIGGER_DELAY_IN_MS = 600;
 	private static final int LID_LFM = 0;
-	private ProgressDialog progress;
+	private SongListActivity songlist;
+
+	public SearchActivity() {
+
+	}
+
+	public SearchActivity(SongListActivity sl) {
+		songlist = sl;
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// Inflate the fragment layout
+		View view = inflater.inflate(R.layout.activity_search,
+				container,
+				false); 
+		ActionBar actionBar = getActivity().getActionBar();
+		list = (ListView) view.findViewById(R.id.search_list);
+		list.setOnItemClickListener(this);
+
+		getLoaderManager().initLoader(LID_LFM, null, this);
+
+		return view;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
-		setContentView(R.layout.activity_search);
-		
-		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setTitle("");
-		actionBar.setIcon(R.drawable.ic_action_back);
-		list = (ListView) findViewById(R.id.search_list);
-		list.setOnItemClickListener(this);
-		
-		progress = new ProgressDialog(this);
-		progress.setTitle("Loading...");
-		
-		getLoaderManager().initLoader(LID_LFM, null, this);
+		setHasOptionsMenu(true);
+		//setContentView(R.layout.activity_search);
+
+
 	}
 
-	private void launchSelectActivity(int pos) {
-		LFMArrayAdapter adapt = (LFMArrayAdapter) list.getAdapter();
-		MusicItem mi = adapt.getItem(pos);
-		
-		if(mi == null)
-			return;
-		
-		Intent intent = new Intent(SearchActivity.this, PostSearchSongListActivity.class);
-		Bundle extras = new Bundle();
-		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"");
-		extras.putBoolean("isPlaylist", false);
-		intent.putExtras(extras);
-		startActivity(intent);
+	public void launchSongList(Bundle bundle) {
+		if(songlist.getActivity() == null){
+			songlist.setArguments(bundle);
+		} else {
+			songlist.setBundle(bundle);
+		}
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).commit();
+		//songlist.onNewBundle(bundle);
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.searchview, menu);
-
+		getActivity().getMenuInflater().inflate(R.menu.searchview, menu);
+		menu.findItem(R.id.action_search).setActionView(new android.widget.SearchView(getActivity()));
 		SearchManager searchManager =
-				(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+				(SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView =
 				(SearchView) menu.findItem(R.id.action_search).getActionView();
 		searchView.setSearchableInfo(
-				searchManager.getSearchableInfo(getComponentName()));
+				searchManager.getSearchableInfo(getActivity().getComponentName()));
 
 		searchView.setOnQueryTextListener(this);
 
 		searchView.setIconifiedByDefault(false);
-
-		return true;
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-		launchSelectActivity(position);
+		LFMArrayAdapter adapt = (LFMArrayAdapter) list.getAdapter();
+		MusicItem mi = adapt.getItem(position);
+		Bundle extras = new Bundle();
+		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"");
+		extras.putBoolean("isPlaylist", false);
+		launchSongList(extras);
 	}
 
 	@Override
 	public Loader<LFMArrayAdapter> onCreateLoader(int id, Bundle bundle) {
 		final String q = (bundle == null ? null : bundle.getString("query"));
-		return new AsyncTaskLoader<LFMArrayAdapter>(this) {
+		return new AsyncTaskLoader<LFMArrayAdapter>(getActivity()) {
 			LFMArrayAdapter data;
-			
+
 			@Override
 			public LFMArrayAdapter loadInBackground() {
-				
+
 				if(q == null || q.length() == 0) {
-					return new LFMArrayAdapter(SearchActivity.this, new MusicTypeCategories());
+					return new LFMArrayAdapter(getActivity(), new MusicTypeCategories());
 				}
-				
+
 				try{
 					String readJSON = JSONParser.getJSON(JSONParser.LASTFM_API_URL+ q);
 					JSONObject jsonObject = new JSONObject(readJSON);
 					JSONArray array = jsonObject.getJSONObject("response").getJSONArray("docs");
 					MusicTypeCategories data = JSONParser.getLastFMListFromJsonArray(array);
-					Log.d("ATRACI", "Search Data: " + data.toString() + "\n\n" + q);
-					LFMArrayAdapter adapt = new LFMArrayAdapter(SearchActivity.this, data);
+					LFMArrayAdapter adapt = new LFMArrayAdapter(getActivity(), data);
 					return adapt;
 
 				} catch(Exception e){
 					Log.e("ATRACI", e.getMessage(), e);
 					e.printStackTrace();} catch (Throwable e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
 				return null;
 			}
@@ -146,13 +160,13 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 					forceLoad();
 				}
 			}
-			
+
 			@Override
 			protected void onStopLoading() {
 				//Attempt to cancel the current load task, if possible.
 				cancelLoad();
 			}
-			
+
 			@Override
 			protected void onReset() {
 				super.onReset();
@@ -171,7 +185,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 
 	@Override
 	public void onLoaderReset(Loader<LFMArrayAdapter> loader) {
-		list.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, new String[] {}));
+		list.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_expandable_list_item_1, new String[] {}));
 	}
 
 	@Override
@@ -183,7 +197,7 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 
 			@Override
 			public void run() {
-				runOnUiThread(new Runnable() {
+				getActivity().runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
@@ -202,12 +216,10 @@ public class SearchActivity extends Activity implements OnItemClickListener, Loa
 	@Override
 	public boolean onQueryTextSubmit(String query) {
 		String text = query.replaceAll(" ", "%20");
-		Intent intent = new Intent(SearchActivity.this, PostSearchSongListActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putString("query", text);
 		bundle.putBoolean("isPlaylist", false);
-		intent.putExtras(bundle);
-		startActivity(intent);
+		launchSongList(bundle);
 		return true;
 	}
 }

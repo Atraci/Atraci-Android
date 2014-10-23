@@ -14,7 +14,7 @@ import android.widget.ListView;
  * list of commits from the Github repo
  * @author Blake LaFleur
  */
-public class HomeNewsFragment extends Fragment {
+public class RootFragment extends Fragment {
 
 	private ListView lv;
 
@@ -30,9 +30,10 @@ public class HomeNewsFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		// Get the ListView from the layout to pass to the loader
-		lv = (ListView)getActivity().findViewById(R.id.commit_list); 
-		// Start the loader to get information from Github
-		getLoaderManager().initLoader(0, null, new NewsLoader(getActivity(), lv));
+//		 Get the ListView from the layout to pass to the loader
+//		lv = (ListView)getActivity().findViewById(R.id.commit_list); 
+//		// Start the loader to get information from Github
+//		getLoaderManager().initLoader(0, null, new NewsLoader(getActivity(), lv));
+//		getActivity().getActionBar().setTitle(R.string.update_feed);
 	}
 }

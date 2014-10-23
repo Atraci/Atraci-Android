@@ -13,21 +13,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
@@ -44,7 +42,7 @@ import android.widget.Toast;
  *
  */
 
-public class PostSearchSongListActivity extends Activity implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener {
+public class SongListActivity extends Fragment implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener {
 
 	GridView m_gridview;
 	private static final int LID_PSSLA = 1;
@@ -53,24 +51,30 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	private int playlistID;
 	private String playlistName;
 	public static final String QUERY_TOP100= "Top 100 Songs";
+	private Bundle bundle;
 
 	@Override
-	public void onCreate(Bundle savedInstance) {
-		super.onCreate(savedInstance);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setProgressBarIndeterminateVisibility(true); 
-		setContentView(R.layout.activity_postsearchsonglist);
-
-		//		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		//		mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-		ActionBar actionBar = getActionBar();
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		// Inflate the fragment layout
+		View view = inflater.inflate(R.layout.activity_postsearchsonglist,
+				container,
+				false); 
+		ActionBar actionBar = getActivity().getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		final Bundle bundle = getIntent().getExtras();
+		bundle = getArguments();
+		if(bundle == null){
+			return view;
+		}
 		isPlaylist = bundle.getBoolean("isPlaylist");
-		actionBar.setTitle(bundle.getString("query"));
-		m_gridview = (GridView) findViewById(R.id.gridview);
+		
+//		if(bundle.getString("query").equals(QUERY_TOP100)){
+//			actionBar.setTitle(getString(R.string.top100));
+//		} else {
+//			actionBar.setTitle(bundle.getString("query"));
+//		}
+		m_gridview = (GridView) view.findViewById(R.id.gridview);
 		getLoaderManager().initLoader(LID_PSSLA, bundle, this);
 		m_gridview.setOnItemClickListener(this);
 		m_gridview.setOnItemLongClickListener(this);
@@ -78,22 +82,60 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		if(isPlaylist) {
 			playlistID = Integer.parseInt(bundle.getString("query"));
 			playlistName = HomeActivity.getDatabase().getPlaylistByID(playlistID).getName();
-			actionBar.setTitle("Playlist: " + playlistName);
+//			actionBar.setTitle("Playlist: " + playlistName);
 		}
+		
+		return view;
+	}
+	
+	@Override
+	public void onCreate(Bundle savedInstance) {
+		//getActivity().requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		super.onCreate(savedInstance);
+		getActivity().setProgressBarIndeterminateVisibility(true); 
+		//getActivity().setContentView(R.layout.activity_postsearchsonglist);
+
+		//		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		//		mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.postsearch, menu);
-		return super.onCreateOptionsMenu(menu);
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		MenuInflater inflater = getMenuInflater();
+//		inflater.inflate(R.menu.postsearch, menu);
+//		return super.onCreateOptionsMenu(menu);
+//	}
+	
+	public void onNewBundle(Bundle bundle){
+//		ActionBar actionBar = getActivity().getActionBar();
+//		actionBar.setDisplayHomeAsUpEnabled(true);
+		isPlaylist = bundle.getBoolean("isPlaylist");
+		
+//		if(bundle.getString("query").equals(QUERY_TOP100)){
+//			actionBar.setTitle(getString(R.string.top100));
+//		} else {
+//			actionBar.setTitle(bundle.getString("query"));
+//		}
+		if(isPlaylist) {
+			playlistID = Integer.parseInt(bundle.getString("query"));
+			playlistName = HomeActivity.getDatabase().getPlaylistByID(playlistID).getName();
+//			actionBar.setTitle("Playlist: " + playlistName);
+		}
+		getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
+	}
+	
+	public void setBundle(Bundle bundle){
+		this.bundle = bundle;
+		getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
 	}
 
 	@Override
 	public Loader<SongListAdapter> onCreateLoader(int id, final Bundle bundle) {
 
 		final String q = JSONParser.ATRACI_API_URL + bundle.getString("query").replaceAll("'", "").replaceAll(" ", "%20");
-		return  new AsyncTaskLoader<SongListAdapter>(this) {
+		return  new AsyncTaskLoader<SongListAdapter>(getActivity()) {
 			SongListAdapter data;
 			@Override
 			public SongListAdapter loadInBackground() {
@@ -111,7 +153,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 						results = HomeActivity.getDatabase().getSongsFromPlaylist(playlistID);
 						HomeActivity.getDatabase().closeConnection();
 					}
-					return new SongListAdapter(PostSearchSongListActivity.this, results);
+					return new SongListAdapter(getActivity(), results);
 				} catch (JSONException e) {
 					Log.e("ATRACI", e.getMessage(), e);
 				} catch (Throwable e) {
@@ -133,7 +175,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 					deliverResult(data);
 				}
 				if(data == null){
-					setProgressBarIndeterminateVisibility(true); 
+					getActivity().setProgressBarIndeterminateVisibility(true); 
 					//					progress.show();
 					forceLoad();
 				}
@@ -155,30 +197,32 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		};
 	}
 	
-	public static void fireIntent(Context  yourClass, String query, boolean isPlaylist) {
-		Intent intent = new Intent(yourClass, PostSearchSongListActivity.class);
+	public static void show(Fragment yourClass, String query, boolean isPlaylist) {
 		Bundle bundle = new Bundle();
 		bundle.putString("query", query);
 		bundle.putBoolean("isPlaylist", isPlaylist);
-		intent.putExtras(bundle);
-		yourClass.startActivity(intent);
+		SongListActivity sla = new SongListActivity();
+		sla.setArguments(bundle);
+		FragmentTransaction ft = yourClass.getFragmentManager().beginTransaction();
+		ft.replace(R.id.root_frame, sla);
+		ft.addToBackStack(null);
+		ft.commit();
+		
 	}
 
 	private void startPlayerActivity(String[] songs, int pos) {
-		Intent intent = new Intent(this, PlayerActivity.class);
 		Bundle bundle = new Bundle();
 		bundle.putStringArray("values", songs);
 		bundle.putInt("position", pos);
-		intent.putExtras(bundle);
-		startActivity(intent);
+		HomeActivity.player.loadNewBundle(bundle);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<SongListAdapter> loader, SongListAdapter adapter) {
 		m_gridview.setAdapter(adapter);
-		setProgressBarIndeterminateVisibility(false); 
+		getActivity().setProgressBarIndeterminateVisibility(false); 
 		if(m_gridview.getAdapter().getCount() == 0) {
-			Toast.makeText(PostSearchSongListActivity.this, "There are no songs to show!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity(), getString(R.string.no_songs), Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -213,7 +257,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 		String[] names = new String[plists.size()];
 		
 		if(plists.size() == 0) {
-			Toast.makeText(this, "You do not have any playlists!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getActivity(), getString(R.string.no_playlists_found), Toast.LENGTH_LONG).show();
 			return true;
 		}
 		
@@ -235,8 +279,8 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	}
 
 	public Dialog createPlaylistDialog(final String[] playlists, final MusicItem item, final View view) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Add to Playlist:");
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle(R.string.add_to_playlist);
 		builder.setItems(playlists, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int pos) {
 				boolean result = HomeActivity.getDatabase().addSongToPlaylist(playlists[pos], item);
@@ -248,9 +292,9 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	            animationY = null;
 	            
 				if(!result) {
-					Toast.makeText(PostSearchSongListActivity.this, "This song already exists in the playlist!", Toast.LENGTH_LONG).show();
+					Toast.makeText(getActivity(), getString(R.string.unexpected_error), Toast.LENGTH_LONG).show();
 				} else {
-					Toast.makeText(PostSearchSongListActivity.this, "Song added to " + playlists[pos] + " playlist!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), getString(R.string.song_added_to) + " " + playlists[pos] +"!", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -259,7 +303,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	
 	public Dialog createDeleteDialog(final String pname, final MusicItem item, final View view) {
 		final Loader<SongListAdapter> loader = getLoaderManager().getLoader(LID_PSSLA);
-	    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    builder.setTitle("Are you sure?");
 	    builder.setMessage("Delete " + item.getTrack() + "?");
 	    builder.setIcon(android.R.drawable.ic_dialog_alert);
@@ -268,7 +312,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	        	Log.d("ATRACI", item.getYoutube());
 	            int result = HomeActivity.getDatabase().deleteSongFromPlaylistByLink(pname, item.getTrack());
 	            if(result > 0) {
-	            	Toast.makeText(PostSearchSongListActivity.this, "Song deleted successfully!", Toast.LENGTH_SHORT).show();
+	            	Toast.makeText(getActivity(), getString(R.string.song_delete_successful), Toast.LENGTH_SHORT).show();
 	                Animation animationY = new ScaleAnimation((float)0.5,0, (float)0.5, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
 	                animationY.setDuration(700);
 	                animationY.setFillEnabled(true);
@@ -277,7 +321,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	                animationY = null;
 	            	loader.forceLoad();
 	            } else {
-	            	Toast.makeText(PostSearchSongListActivity.this, "There was an unknown error while deleting the song :(", Toast.LENGTH_LONG).show();
+	            	Toast.makeText(getActivity(), getString(R.string.unexpected_error), Toast.LENGTH_LONG).show();
 	            }
 	      } });
 	    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -288,7 +332,7 @@ public class PostSearchSongListActivity extends Activity implements LoaderCallba
 	            animationY.setFillAfter(true);
 	            view.startAnimation(animationY);  
 	            animationY = null;
-	            finish();
+	            getActivity().finish();
 	      } });
 	    return builder.create();
 	}

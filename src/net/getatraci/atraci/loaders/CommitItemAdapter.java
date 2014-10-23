@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.CommitItem;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,14 +38,20 @@ public class CommitItemAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
-        if(view == null)
+		
+		View v = view;
+		TextView tv;
+		
+        if(v == null)
         {
-           return inflater.inflate(R.layout.commit_item, parent, false);
+        	v = inflater.inflate(R.layout.commit_item, parent, false);
+            v.setTag(R.id.commit_message, v.findViewById(R.id.commit_message));
         }
         
-        TextView tv = (TextView) view.findViewById(R.id.commit_message);
+        tv = (TextView)v.getTag(R.id.commit_message);
+        
         tv.setText(items.get(position).getMessage());        
-		return view;
+		return v;
 	}
 
 

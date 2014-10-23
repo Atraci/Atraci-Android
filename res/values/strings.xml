@@ -14,10 +14,11 @@
 
     <string-array name="navigation_items">
         <item>Home</item>
-        <item>Top Tracks</item>
-        <item>Top 100</item>
+        <item>Top 100 Chart</item>
         <item>My Playlists</item>
+        <item>Now Playing</item>
         <item>Donate</item>
+        <item>Settings</item>
     </string-array>
 
     <string name="play">Play</string>
@@ -26,11 +27,22 @@
     <string name="forwardarrow">&gt;&gt;</string>
     <string name="title_activity_playlist_selector">PlaylistSelectorActivity</string>
     <string name="playlists">My Playlists</string>
-    <string name="top100">Top 100</string>
-    <string name="top_tracks">Top Tracks</string>
+    <string name="top100">Top 100 Chart</string>
     <string name="add_playlist">Add Playlist</string>
     <string name="playlist_hint">Enter playlist name</string>
     <string name="shuffle">Shuffle</string>
     <string name="repeat">Repeat</string>
+    <string name="playlist_exists">"That playlist already exists! Please choose a different name!"</string>
+    <string name="no_playlists_found">No playlists found!</string>
+    <string name="no_songs">There are no songs to show!</string>
+    <string name="add_to_playlist">Add to Playlist:</string>
+    <string name="exists_in_playlist">The selected song is already </string>
+    <string name="unexpected_error">An unexpected error has occurred!</string>
+    <string name="song_delete_successful">Song deleted successfully!</string>
+    <string name="song_added_to">Song added to </string>
+    <string name="playlist">Playlist</string>
+    <string name="has_been_deleted">has been deleted!</string>
+    <string name="loading">Loading</string>
+    <string name="update_feed">Update Feed</string>
 
 </resources>
