@@ -12,7 +12,6 @@ import net.getatraci.atraci.loaders.LFMArrayAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
@@ -56,7 +55,6 @@ public class SearchActivity extends Fragment implements OnItemClickListener, Loa
 		View view = inflater.inflate(R.layout.activity_search,
 				container,
 				false); 
-		ActionBar actionBar = getActivity().getActionBar();
 		list = (ListView) view.findViewById(R.id.search_list);
 		list.setOnItemClickListener(this);
 

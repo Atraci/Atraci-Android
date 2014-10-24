@@ -7,7 +7,7 @@ import android.webkit.JavascriptInterface;
 
 public class PlayerJSInterface {
 	
-	private PlayerActivity player;
+	private static PlayerActivity player;
 	
 	public PlayerJSInterface(PlayerActivity context) {
 		player = context;
@@ -40,18 +40,21 @@ public class PlayerJSInterface {
 	}
 	
 	@JavascriptInterface
-	public int getScreenWidth() {
+	public static int getScreenWidth() {
 		Display display = player.getActivity().getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		return size.x;
+		return player.getWv_frame().getWidth();
 		
 		//return player.getWebView().getWidth();
 	}
 	
 	@JavascriptInterface
-	public int getScreenHeight() {
-		return player.getWebView().getHeight();
+	public static int getScreenHeight() {
+		Display display = player.getActivity().getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		return player.getWv_frame().getHeight();
 	}
 	
 	@JavascriptInterface
@@ -61,8 +64,14 @@ public class PlayerJSInterface {
 	}
 	
 	@JavascriptInterface
+	public int getTimePlayed() {
+		return player.getTimePlayed();
+	}
+	
+	@JavascriptInterface
 	public void setVideoTime(int time) {
 		player.getSeekBar().setProgress(time);
+		player.setTimePlayed(time);
 		player.setTimeViewTime(time);
 	}
 	

@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
@@ -49,7 +50,6 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 	private ArrayList<MusicItem> results;
 	private boolean isPlaylist;
 	private int playlistID;
-	private String playlistName;
 	public static final String QUERY_TOP100= "Top 100 Songs";
 	private Bundle bundle;
 
@@ -69,11 +69,6 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 		}
 		isPlaylist = bundle.getBoolean("isPlaylist");
 		
-//		if(bundle.getString("query").equals(QUERY_TOP100)){
-//			actionBar.setTitle(getString(R.string.top100));
-//		} else {
-//			actionBar.setTitle(bundle.getString("query"));
-//		}
 		m_gridview = (GridView) view.findViewById(R.id.gridview);
 		getLoaderManager().initLoader(LID_PSSLA, bundle, this);
 		m_gridview.setOnItemClickListener(this);
@@ -81,8 +76,6 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 		
 		if(isPlaylist) {
 			playlistID = Integer.parseInt(bundle.getString("query"));
-			playlistName = HomeActivity.getDatabase().getPlaylistByID(playlistID).getName();
-//			actionBar.setTitle("Playlist: " + playlistName);
 		}
 		
 		return view;
@@ -90,38 +83,14 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 	
 	@Override
 	public void onCreate(Bundle savedInstance) {
-		//getActivity().requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstance);
 		getActivity().setProgressBarIndeterminateVisibility(true); 
-		//getActivity().setContentView(R.layout.activity_postsearchsonglist);
-
-		//		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		//		mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-
 	}
 
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		MenuInflater inflater = getMenuInflater();
-//		inflater.inflate(R.menu.postsearch, menu);
-//		return super.onCreateOptionsMenu(menu);
-//	}
-	
 	public void onNewBundle(Bundle bundle){
-//		ActionBar actionBar = getActivity().getActionBar();
-//		actionBar.setDisplayHomeAsUpEnabled(true);
 		isPlaylist = bundle.getBoolean("isPlaylist");
-		
-//		if(bundle.getString("query").equals(QUERY_TOP100)){
-//			actionBar.setTitle(getString(R.string.top100));
-//		} else {
-//			actionBar.setTitle(bundle.getString("query"));
-//		}
 		if(isPlaylist) {
 			playlistID = Integer.parseInt(bundle.getString("query"));
-			playlistName = HomeActivity.getDatabase().getPlaylistByID(playlistID).getName();
-//			actionBar.setTitle("Playlist: " + playlistName);
 		}
 		getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
 	}
@@ -176,7 +145,6 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 				}
 				if(data == null){
 					getActivity().setProgressBarIndeterminateVisibility(true); 
-					//					progress.show();
 					forceLoad();
 				}
 			}
@@ -214,7 +182,7 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 		Bundle bundle = new Bundle();
 		bundle.putStringArray("values", songs);
 		bundle.putInt("position", pos);
-		HomeActivity.player.loadNewBundle(bundle);
+		((PlayerActivity)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
 	}
 
 	@Override

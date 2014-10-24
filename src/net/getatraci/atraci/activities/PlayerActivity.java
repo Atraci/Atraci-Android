@@ -2,37 +2,29 @@ package net.getatraci.atraci.activities;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
-import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
 import net.getatraci.atraci.loaders.PlayerLoader;
 import net.getatraci.atraci.loaders.QueueListAdapter;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -40,6 +32,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -54,13 +47,14 @@ import android.widget.TextView;
  *
  */
 @SuppressLint("SetJavaScriptEnabled")
-public class PlayerActivity extends Fragment implements OnKeyListener, OnItemClickListener{
+public class PlayerActivity extends Fragment implements OnItemClickListener{
 
 	private int position = 0;  //The position to be stored from the bundle
 	private ImageButton play_button,prev_button, next_button, shuffle_button, repeat_button;	//Buttonbar buttons
 	private SeekBar seekBar;
 	private TextView time, total_time;
 	private ListView queue_list;
+	private FrameLayout wv_frame;
 	private WebView wv;	// The webview that contains the HTML file of the video viewer 
 	private String[] query; // The list to be stored from the bundle containing songs
 	private Notification notification; // Notification for the notification drawer
@@ -73,27 +67,29 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	private boolean shuffle = false;
 	private boolean repeat = false;
 	private boolean isSeeking = false;
-	private ActionBar actionBar;
-	private AudioManager am;
 	private LoaderManager manager;
 	private Loader<String[]> mLoader;
 	private QueueListAdapter q_adapter;
+	private int timePlayed;
 	private Bundle bundle;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		Log.d("ATRACI","new instance state: " + Boolean.toString(savedInstanceState==null));
 		// Inflate the fragment layout
 		View view = inflater.inflate(R.layout.activity_player,
 				container,
 				false); 
-		view.setOnKeyListener(this);
-		actionBar = getActivity().getActionBar();
 		manager = getLoaderManager();
 		loader = new PlayerLoader(this);
-		getActivity();
 		mNotifyMgr = (NotificationManager) getActivity().getSystemService(Activity.NOTIFICATION_SERVICE);
 		wv = (WebView)view.findViewById(R.id.youtube_view);
+		if(savedInstanceState != null) {
+			wv.restoreState(savedInstanceState);
+			timePlayed = savedInstanceState.getInt("timeplayed");
+		}
 		setUpWebview();
 
 		play_button = (ImageButton)view.findViewById(R.id.playbut);
@@ -105,6 +101,7 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		time = (TextView)view.findViewById(R.id.play_time);
 		total_time = (TextView)view.findViewById(R.id.total_time);
 		queue_list = (ListView)view.findViewById(R.id.queue_list);
+		wv_frame = (FrameLayout) view.findViewById(R.id.webview_frame);
 
 		//Load button action listeners
 		setPlayButtonOnClick();
@@ -115,8 +112,11 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		setSeekbarOnChange();
 		//Get data from the bundle
 		bundle = getArguments();
-		if(bundle == null){
-			return view; //return early because no args
+		if(bundle == null && savedInstanceState == null){
+			return view;
+		}
+		else if(bundle == null){
+			bundle = savedInstanceState.getBundle("oldBundle");
 		}
 		query = bundle.getStringArray("values");
 		position = bundle.getInt("position");
@@ -125,18 +125,29 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		queue_list.setOnItemClickListener(this);
 		//Load the song to being playing
 		manager.initLoader(123, bundle, loader);
-		mLoader = manager.initLoader(123, bundle, loader);
-		am = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-		enableMediaKeys();
-		
+		mLoader = manager.restartLoader(123, bundle, loader);
 		return view;
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		wv.saveState(outState);
+		outState.putBundle("oldBundle", bundle);
+		outState.putInt("timeplayed", timePlayed);
+		if(timer != null){
+			timer.cancel();
+		}
+		super.onSaveInstanceState(outState);
 	}
 	
+	
+
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;
 	}
@@ -163,14 +174,6 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-	}
-
-	private void enableMediaKeys() {
-		am.registerMediaButtonEventReceiver(new ComponentName(getActivity(), RemoteControlReceiver.class.getName()));
-	}
-	
-	private void disableMediaKeys() {
-		am.unregisterMediaButtonEventReceiver(new ComponentName(getActivity(), RemoteControlReceiver.class));
 	}
 
 	public void setSeekbarOnChange() {
@@ -312,6 +315,9 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	 * Pauses the player via the JavascriptInterface and resets the UI
 	 */
 	public void pauseVideo() {
+		if(getActivity() == null){
+			return;
+		}
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -330,6 +336,11 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	 */
 	public void stopVideo() {
 		videoOver = true;
+		timePlayed = 0;
+		if(getActivity() == null){
+			return;
+		}
+		
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -347,6 +358,9 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	 * Starts the player via the JavascriptInterface and resets the UI
 	 */
 	public void playVideo() {
+		if(getActivity() == null){
+			return;
+		}
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -359,6 +373,9 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	}
 
 	public void startTimer() {
+		if(getActivity() == null){
+			return;
+		}
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 
@@ -406,7 +423,7 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 	public void showNotification(String ticker, String title, String content) {
 		//Create an intent that will bring the last activity back to the front 
 		//if the application is in the background.
-		Intent notIntent = new Intent(getActivity(), PlayerActivity.class);
+		Intent notIntent = new Intent(getActivity(), HomeActivity.class);
 		notIntent.setAction(Intent.ACTION_MAIN);
 		notIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		notIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|
@@ -430,6 +447,7 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		//Create the notification or update it if it already exists
 		mNotifyMgr.notify(NOTIFY_ID, notification);
 	}
+	
 
 	/**
 	 * Removes the notification from the notification drawer
@@ -560,22 +578,11 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		wv.addJavascriptInterface(new PlayerJSInterface(this), "JSInt");
 		wv.setPadding(0, 0, 0, 0);
 		wv.getSettings().setLoadWithOverviewMode(true);
-		//Video is widescreen so we need a wide viewport
+		//Use html defined sizes over webview defaults
 		wv.getSettings().setUseWideViewPort(true);
 		//Disable the user from being able to move the video around
 		wv.setVerticalScrollBarEnabled(false);
 		wv.setHorizontalScrollBarEnabled(false);
-	}
-
-	@Override
-	public boolean onKey(View v, int keyCode, KeyEvent event) {
-	    if( keyCode == KeyEvent.KEYCODE_BACK ){
-            // back to previous fragment by tag
-          getFragmentManager().beginTransaction().hide(this).commit();
-          getFragmentManager().beginTransaction().replace(R.id.content_frame, getFragmentManager().findFragmentByTag("songlist"));
-          return true;
-    }
-	    return false;
 	}
 
 	@Override
@@ -586,6 +593,22 @@ public class PlayerActivity extends Fragment implements OnKeyListener, OnItemCli
 		q_adapter.notifyDataSetChanged();
 		manager.getLoader(123).forceLoad();
 				
+	}
+
+	public int getTimePlayed() {
+		return timePlayed;
+	}
+
+	public void setTimePlayed(int timePlayed) {
+		this.timePlayed = timePlayed;
+	}
+
+	public FrameLayout getWv_frame() {
+		return wv_frame;
+	}
+
+	public void setWv_frame(FrameLayout wv_frame) {
+		this.wv_frame = wv_frame;
 	}
 
 }

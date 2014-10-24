@@ -13,7 +13,7 @@
       var player;
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
-          height: JSInt.getScreenWidth()/2,
+          height: JSInt.getScreenHeight(),
           width: JSInt.getScreenWidth(),
           videoId: '%@',
           playerVars: { 'rel' : 0, 'enablejsapi' : 1 },
@@ -29,6 +29,7 @@
       		player.stopVideo();
       		player.playVideo();
       		player.pauseVideo();
+      		player.seekTo(JSInt.getTimePlayed(), true);
   			JSInt.onPlayerReady();
   			JSInt.setTitle(player.getVideoData().title);
       }

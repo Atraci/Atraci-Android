@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.DatabaseHelper;
-import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.data.Playlists;
 import net.getatraci.atraci.loaders.PlaylistListAdapter;
 import net.getatraci.atraci.loaders.SongListAdapter;
@@ -16,7 +15,6 @@ import android.content.AsyncTaskLoader;
 import android.content.DialogInterface;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;

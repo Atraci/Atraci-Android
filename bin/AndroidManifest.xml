@@ -40,7 +40,8 @@
                 android:value="net.getatraci.atraci.activities.SearchActivity" />
                  />
         </activity>
-        <activity android:name="net.getatraci.atraci.activities.HomeActivity" >
+        <activity android:name="net.getatraci.atraci.activities.HomeActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
         </activity>
         <activity
             android:name="net.getatraci.atraci.activities.SongListActivity"
@@ -48,9 +49,9 @@
         </activity>
         <activity
             android:name="net.getatraci.atraci.activities.PlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_player"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+             >
         </activity>
         <activity
             android:name="net.getatraci.atraci.activities.PlaylistSelectorFragment"

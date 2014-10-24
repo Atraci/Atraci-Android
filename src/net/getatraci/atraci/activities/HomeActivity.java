@@ -12,9 +12,11 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -36,8 +38,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	private static DatabaseHelper database;
 	public static ViewPager pager;
 	static PagerFragmentAdapter pageAdapter;
-	RootFragment news;
-	static PlayerActivity player;
 	SearchActivity search;
 	PlaylistSelectorFragment playlists;
 	SongListActivity songlist;
@@ -45,45 +45,37 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-		
-		news = new RootFragment();
-		player = new PlayerActivity();
-		songlist = new SongListActivity();
-		search = new SearchActivity(songlist);
-		
-		//Array order
-		fragments.add(news);
-		fragments.add(player);
-		
-		pager = (ViewPager)findViewById(R.id.content_frame);
-		pageAdapter = new PagerFragmentAdapter(this.getFragmentManager(), fragments);
-		pager.setAdapter(pageAdapter);
-	
-		database = new DatabaseHelper(this.getApplicationContext());
-		mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationDrawerItemTitles));
+		Log.d("ATRACI", "Home on create()  " + Boolean.toString((savedInstanceState == null)));
 
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+			pager = (ViewPager)findViewById(R.id.content_frame);
+			pager.setOffscreenPageLimit(2);
+			pageAdapter = new PagerFragmentAdapter(this.getFragmentManager());
+			pager.setAdapter(pageAdapter);
+			database = new DatabaseHelper(this.getApplicationContext());
+			mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
+			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+			mDrawerList = (ListView) findViewById(R.id.left_drawer);
+			mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationDrawerItemTitles));
+			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
-			/** Called when a drawer has settled in a completely closed state. */
-			public void onDrawerClosed(View view) {
-				super.onDrawerClosed(view);
-			}
+				/** Called when a drawer has settled in a completely closed state. */
+				public void onDrawerClosed(View view) {
+					super.onDrawerClosed(view);
+				}
 
-			/** Called when a drawer has settled in a completely open state. */
-			public void onDrawerOpened(View drawerView) {
-				super.onDrawerOpened(drawerView);
-			}
-		};
+				/** Called when a drawer has settled in a completely open state. */
+				public void onDrawerOpened(View drawerView) {
+					super.onDrawerOpened(drawerView);
+				}
+			};
 
-		// Set the drawer toggle as the DrawerListener
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		// Set the click listener to the callbacks in this Activity
-		mDrawerList.setOnItemClickListener(this);	
+			// Set the drawer toggle as the DrawerListener
+			mDrawerLayout.setDrawerListener(mDrawerToggle);
+			// Set the click listener to the callbacks in this Activity
+			mDrawerList.setOnItemClickListener(this);	
 		// Make the AppIcon clickable
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		// Allow user to tap the appicon
@@ -103,14 +95,14 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.home, menu); 
 		return true;
 	}
-	
+
 	/* Listener for navbar items like search and drawer */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -138,14 +130,18 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	/* Function that starts the Seaching activity */
 	private void openSearch() {
+		if(search == null){
+			search = new SearchActivity(songlist);
+		}
 		pager.setCurrentItem(0);
+		mDrawerLayout.closeDrawers();
 		getFragmentManager().beginTransaction().replace(R.id.root_frame, search).addToBackStack(null).commit();
 	}
 
 	/* Listener for when user clicks an item in the Navigation Drawer */
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to use the root fragment
+		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to see the root fragment
 		switch(position) {
 		case 0:		// Home item clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();
@@ -174,23 +170,26 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		mDrawerLayout.closeDrawer(mDrawerList);
 
 	}
-	
+
 	private void launchTop100() {
 		Bundle bundle = new Bundle();
 		bundle.putString("query", SongListActivity.QUERY_TOP100);
 		bundle.putBoolean("isPlaylist", false);
+		if(songlist == null){
+			songlist = new SongListActivity();
+		}
 		if(songlist.getActivity() == null){
 			songlist.setArguments(bundle);
 		} else {
 			songlist.setBundle(bundle);
 		}
-		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).commit();
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).addToBackStack(null).commit();
 	}
-	
+
 	public ViewPager getPager() {
 		return pager;
 	}
-	
+
 	public ArrayList<Fragment> getFragments() {
 		return fragments;
 	}
