@@ -44,7 +44,7 @@ public class CommitItemAdapter extends BaseAdapter {
 		
         if(v == null)
         {
-        	v = inflater.inflate(R.layout.commit_item, parent, false);
+        	v = inflater.inflate(R.layout.news_commit_item, parent, false);
             v.setTag(R.id.commit_message, v.findViewById(R.id.commit_message));
         }
         

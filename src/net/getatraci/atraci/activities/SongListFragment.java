@@ -43,7 +43,7 @@ import android.widget.Toast;
  *
  */
 
-public class SongListActivity extends Fragment implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener {
+public class SongListFragment extends Fragment implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener {
 
 	GridView m_gridview;
 	private static final int LID_PSSLA = 1;
@@ -57,7 +57,7 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the fragment layout
-		View view = inflater.inflate(R.layout.activity_postsearchsonglist,
+		View view = inflater.inflate(R.layout.fragment_postsearchsonglist,
 				container,
 				false); 
 		ActionBar actionBar = getActivity().getActionBar();
@@ -169,7 +169,7 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 		Bundle bundle = new Bundle();
 		bundle.putString("query", query);
 		bundle.putBoolean("isPlaylist", isPlaylist);
-		SongListActivity sla = new SongListActivity();
+		SongListFragment sla = new SongListFragment();
 		sla.setArguments(bundle);
 		FragmentTransaction ft = yourClass.getFragmentManager().beginTransaction();
 		ft.replace(R.id.root_frame, sla);
@@ -182,7 +182,7 @@ public class SongListActivity extends Fragment implements LoaderCallbacks<SongLi
 		Bundle bundle = new Bundle();
 		bundle.putStringArray("values", songs);
 		bundle.putInt("position", pos);
-		((PlayerActivity)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
+		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
 	}
 
 	@Override

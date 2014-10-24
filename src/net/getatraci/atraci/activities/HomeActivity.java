@@ -38,9 +38,9 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	private static DatabaseHelper database;
 	public static ViewPager pager;
 	static PagerFragmentAdapter pageAdapter;
-	SearchActivity search;
+	SearchFragment search;
 	PlaylistSelectorFragment playlists;
-	SongListActivity songlist;
+	SongListFragment songlist;
 	ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 
 	@Override
@@ -58,7 +58,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 			mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
 			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 			mDrawerList = (ListView) findViewById(R.id.left_drawer);
-			mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationDrawerItemTitles));
+			mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.navigation_bar_item, mNavigationDrawerItemTitles));
 			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
 				/** Called when a drawer has settled in a completely closed state. */
@@ -131,7 +131,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	/* Function that starts the Seaching activity */
 	private void openSearch() {
 		if(search == null){
-			search = new SearchActivity(songlist);
+			search = new SearchFragment(songlist);
 		}
 		pager.setCurrentItem(0);
 		mDrawerLayout.closeDrawers();
@@ -173,10 +173,10 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	private void launchTop100() {
 		Bundle bundle = new Bundle();
-		bundle.putString("query", SongListActivity.QUERY_TOP100);
+		bundle.putString("query", SongListFragment.QUERY_TOP100);
 		bundle.putBoolean("isPlaylist", false);
 		if(songlist == null){
-			songlist = new SongListActivity();
+			songlist = new SongListFragment();
 		}
 		if(songlist.getActivity() == null){
 			songlist.setArguments(bundle);

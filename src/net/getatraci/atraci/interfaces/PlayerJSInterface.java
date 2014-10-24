@@ -1,15 +1,15 @@
 package net.getatraci.atraci.interfaces;
 
-import net.getatraci.atraci.activities.PlayerActivity;
+import net.getatraci.atraci.activities.PlayerFragment;
 import android.graphics.Point;
 import android.view.Display;
 import android.webkit.JavascriptInterface;
 
 public class PlayerJSInterface {
 	
-	private static PlayerActivity player;
+	private static PlayerFragment player;
 	
-	public PlayerJSInterface(PlayerActivity context) {
+	public PlayerJSInterface(PlayerFragment context) {
 		player = context;
 	}
 	

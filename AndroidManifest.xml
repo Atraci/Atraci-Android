@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.getatraci.atraci.activities.SearchActivity"
+            android:name="net.getatraci.atraci.activities.SearchFragment"
             android:parentActivityName="net.getatraci.atraci.activities.HomeActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -44,11 +44,11 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
         </activity>
         <activity
-            android:name="net.getatraci.atraci.activities.SongListActivity"
-            android:parentActivityName="net.getatraci.atraci.activities.SearchActivity" >
+            android:name="net.getatraci.atraci.activities.SongListFragment"
+            android:parentActivityName="net.getatraci.atraci.activities.SearchFragment" >
         </activity>
         <activity
-            android:name="net.getatraci.atraci.activities.PlayerActivity"
+            android:name="net.getatraci.atraci.activities.PlayerFragment"
             android:label="@string/title_activity_player"
             android:launchMode="singleTop"
              >

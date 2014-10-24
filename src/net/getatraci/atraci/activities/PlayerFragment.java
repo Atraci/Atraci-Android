@@ -47,7 +47,7 @@ import android.widget.TextView;
  *
  */
 @SuppressLint("SetJavaScriptEnabled")
-public class PlayerActivity extends Fragment implements OnItemClickListener{
+public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 	private int position = 0;  //The position to be stored from the bundle
 	private ImageButton play_button,prev_button, next_button, shuffle_button, repeat_button;	//Buttonbar buttons
@@ -79,7 +79,7 @@ public class PlayerActivity extends Fragment implements OnItemClickListener{
 		
 		Log.d("ATRACI","new instance state: " + Boolean.toString(savedInstanceState==null));
 		// Inflate the fragment layout
-		View view = inflater.inflate(R.layout.activity_player,
+		View view = inflater.inflate(R.layout.fragment_player,
 				container,
 				false); 
 		manager = getLoaderManager();

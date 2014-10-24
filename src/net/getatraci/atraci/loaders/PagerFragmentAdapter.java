@@ -1,6 +1,6 @@
 package net.getatraci.atraci.loaders;
 
-import net.getatraci.atraci.activities.PlayerActivity;
+import net.getatraci.atraci.activities.PlayerFragment;
 import net.getatraci.atraci.activities.RootFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -24,7 +24,7 @@ public class PagerFragmentAdapter extends FragmentPagerAdapter {
 		case 0:
 			return new RootFragment();
 		case 1:
-			return new PlayerActivity();
+			return new PlayerFragment();
 		}
 		return null;
 	}

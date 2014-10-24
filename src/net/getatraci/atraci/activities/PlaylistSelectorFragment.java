@@ -71,7 +71,7 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.activity_playlist_selector, container, false);
+		View v = inflater.inflate(R.layout.fragment_playlist_selector, container, false);
 		list = (ListView) v.findViewById(R.id.playlists_list);
 		list.setOnItemLongClickListener(this);
 		list.setOnItemClickListener(this);
@@ -99,7 +99,7 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 
 	public void openTextField() {
 		getActivity().getActionBar().setTitle("");
-		mMenu.findItem(R.id.action_add).setActionView(R.layout.menu_textngo);
+		mMenu.findItem(R.id.action_add).setActionView(R.layout.actionbar_edittext);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_button).setOnClickListener(this);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnFocusChangeListener(this);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnKeyListener(this);
@@ -206,7 +206,7 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 			long id) {
 		Playlists plist = ((Playlists)list.getAdapter().getItem(position));
 		Toast.makeText(getActivity(), getString(R.string.loading)+ " " + plist.getName(), Toast.LENGTH_LONG).show();
-		SongListActivity.show(this, Integer.toString(plist.getId()), true);
+		SongListFragment.show(this, Integer.toString(plist.getId()), true);
 	}
 
 	@Override

@@ -32,19 +32,19 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 
-public class SearchActivity extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener {
+public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener {
 
 	private ListView list;
 	private Timer timer = new Timer();
 	private final long SEARCH_TRIGGER_DELAY_IN_MS = 600;
 	private static final int LID_LFM = 0;
-	private SongListActivity songlist;
+	private SongListFragment songlist;
 
-	public SearchActivity() {
+	public SearchFragment() {
 
 	}
 
-	public SearchActivity(SongListActivity sl) {
+	public SearchFragment(SongListFragment sl) {
 		songlist = sl;
 	}
 
@@ -202,7 +202,7 @@ public class SearchActivity extends Fragment implements OnItemClickListener, Loa
 						Bundle bundle = new Bundle();
 						String text = newText.replaceAll(" ", "%20");
 						bundle.putString("query", text);
-						getLoaderManager().restartLoader(LID_LFM, bundle, SearchActivity.this);
+						getLoaderManager().restartLoader(LID_LFM, bundle, SearchFragment.this);
 					}});		
 			}
 

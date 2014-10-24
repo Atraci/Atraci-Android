@@ -1,6 +1,6 @@
 package net.getatraci.atraci.loaders;
 
-import net.getatraci.atraci.activities.PlayerActivity;
+import net.getatraci.atraci.activities.PlayerFragment;
 import net.getatraci.atraci.json.JSONParser;
 
 import org.json.JSONException;
@@ -22,14 +22,14 @@ import android.webkit.WebView;
 
 public class PlayerLoader implements LoaderCallbacks<String[]> {
 	
-	private PlayerActivity activity;
+	private PlayerFragment activity;
 	private WebView wv;
 	
 	/**
 	 * 
 	 * @param player the instance of the player class that called the loader
 	 */
-	public PlayerLoader(PlayerActivity player) {
+	public PlayerLoader(PlayerFragment player) {
 		activity = player;
 	}
 	
