@@ -77,7 +77,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+
 		// Inflate the fragment layout
 		View view = inflater.inflate(R.layout.fragment_player,
 				container,
@@ -123,11 +123,10 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		q_adapter = new QueueListAdapter(getActivity(), query, position);
 		queue_list.setOnItemClickListener(this);
 		//Load the song to being playing
-		manager.initLoader(123, bundle, loader);
 		mLoader = manager.restartLoader(123, bundle, loader);
 		return view;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -144,29 +143,32 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		}
 		super.onSaveInstanceState(outState);
 	}
-	
-	
+
+
 
 	public void setBundle(Bundle bundle) {
 		this.bundle = bundle;
 	}
-	
-	
 
-//	@Override
+
+
+	//	@Override
 	public void loadNewBundle(Bundle bundle) {
 		HomeActivity.pager.setCurrentItem(1);
-	
 		this.bundle = bundle;
 		if(bundle != null) {
 			query = bundle.getParcelableArrayList("values");
 			position = bundle.getInt("position");
 			stopVideo();
-			mLoader = manager.restartLoader(123, bundle, loader);
+			if(manager.getLoader(123) == null){
+				mLoader = manager.restartLoader(123, bundle, loader);
+			} else {
+				manager.getLoader(123).forceLoad();
+			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -321,7 +323,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 				play_button.setImageResource(R.drawable.ic_action_play);
 				cancelNotification();
 				if(timer != null) {
-				timer.cancel();
+					timer.cancel();
 				}
 				playing = false;
 			}});
@@ -336,7 +338,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		if(getActivity() == null){
 			return;
 		}
-		
+
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -443,7 +445,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		//Create the notification or update it if it already exists
 		mNotifyMgr.notify(NOTIFY_ID, notification);
 	}
-	
+
 
 	/**
 	 * Removes the notification from the notification drawer
@@ -557,7 +559,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 		return getRandomIndex();
 	}
-	
+
 	private void setUpWebview() {
 		//Set the websettings to allow javascript injection, and media playback
 		// without the need for the user to tap play on the webview
@@ -566,7 +568,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		websettings.setDomStorageEnabled(true);
 		websettings.setDatabaseEnabled(true);
 		websettings.setMediaPlaybackRequiresUserGesture(false);
-		
+
 		//Set the webclients to support HTML5
 		wv.setWebViewClient(new WebViewClient());
 		wv.setWebChromeClient(new WebChromeClient());
@@ -588,7 +590,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		q_adapter.setPos(position);
 		q_adapter.notifyDataSetChanged();
 		manager.getLoader(123).forceLoad();
-				
+
 	}
 
 	public int getTimePlayed() {
