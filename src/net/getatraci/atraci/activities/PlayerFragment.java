@@ -423,7 +423,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public void showNotification(String ticker, String title, String content) {
 		//Create an intent that will bring the last activity back to the front 
 		//if the application is in the background.
-		Intent notIntent = new Intent(getActivity(), HomeActivity.class);
+		Intent notIntent = new Intent(getActivity(), SplashActivity.class);
 		notIntent.setAction(Intent.ACTION_MAIN);
 		notIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		notIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|
