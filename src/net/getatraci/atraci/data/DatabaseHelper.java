@@ -91,7 +91,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(HISTORY_COVER_MED, item.getImage_med());
 		values.put(HISTORY_COVER_LARGE, item.getImage_lrg());
 		db.replace(TABLE_HISTORY, null, values);
-		db.close();
 	}
 	
 	public ArrayList<MusicItem> getHistory() {
@@ -101,7 +100,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		Cursor c = db.rawQuery(query, null);
 		if(!c.moveToFirst()) {
-			db.close();
 			return songs;
 		}
 		
@@ -115,7 +113,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
 			songs.add(item);
 		} while(c.moveToNext());
-		db.close();
 		return songs;
 	}
 	
@@ -125,7 +122,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(PLAYLISTS_NAME, playlist);
 		long result = db.insert(TABLE_PLAYLISTS, null, values);
-		db.close();
 		return result;
 	}
 	
@@ -134,13 +130,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.delete(TABLE_SONGS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
 		db.delete(TABLE_PLAYLISTS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
-		db.close();
+
 	}
 	
 	public int deleteSongFromPlaylistByLink(String id, String title) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		int result = db.delete(TABLE_SONGS, SONGS_TITLE + " = ? AND " + KEY_ID + " = ?", new String[]{title, id});
-		db.close();
 		return result;
 	}
 	
@@ -152,12 +147,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(query, null);
 		
 		if(c == null || !c.moveToFirst()) {
-			db.close();
 			return new Playlists();
 		}
 		
 		Playlists playlist = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
-		db.close();
 		return playlist;
 	}
 	
@@ -173,7 +166,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 		
 		Playlists playlist = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
-		db.close();
 		return playlist;
 	}
 	
@@ -186,7 +178,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(query, null);
 		
 		if(c == null || !c.moveToFirst()) {
-			db.close();
 			return playlists;
 		}
 		
@@ -194,7 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			Playlists p = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
 			playlists.add(p);
 		} while(c.moveToNext());
-		db.close();
+
 		return playlists;
 	}
 	
@@ -205,7 +196,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		Cursor c = db.rawQuery(query, new String[]{Integer.toString(id)});
 		if(!c.moveToFirst()) {
-			db.close();
 			return playlists;
 		}
 		
@@ -219,7 +209,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
 			playlists.add(item);
 		} while(c.moveToNext());
-		db.close();
 		return playlists;
 	}
 	
@@ -237,5 +226,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		long result = db.insert(TABLE_SONGS, null, values);
 		db.close();
 		return (result > 0 ? true : false);
+	}
+	
+	public void closeDatabaseConnection() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.close();
+		db = this.getReadableDatabase();
+		db.close();
 	}
 }

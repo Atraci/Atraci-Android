@@ -60,7 +60,7 @@ public class SongListAdapter extends BaseAdapter {
         name.setText(items.get(i).getTrack()+"\n"+items.get(i).getArtist());
         
         Animation animationY = new TranslateAnimation(0, 0, viewGroup.getHeight()/4, 0);
-        animationY.setDuration(1000);
+        animationY.setDuration(500);
         v.startAnimation(animationY);  
         animationY = null; 
         return v;

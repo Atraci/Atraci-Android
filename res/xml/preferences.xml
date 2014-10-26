@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-		<PreferenceCategory android:title="@string/hello_world">
-		    <CheckBoxPreference android:title="@string/hello_world"/>
-		</PreferenceCategory>
-	</PreferenceScreen>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <ListPreference
+        android:key="quality"
+        android:entries="@array/quality_names"
+        android:entryValues="@array/quality_values"
+        android:summary="@string/quality_desc"
+        android:title="@string/use_low_quality"
+        android:defaultValue="@string/quality_injection" />
+
+</PreferenceScreen>

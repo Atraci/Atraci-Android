@@ -103,6 +103,9 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 	@Override
 	public void onLoadFinished(Loader<String[]> loader, String[] data) {
 		activity.getQueue_list().setAdapter(new QueueListAdapter(activity.getActivity(), activity.getQuery(), activity.getPosition()));
+		if(activity.getPosition() > 3){
+		activity.getQueue_list().setSelection(activity.getPosition()-2);
+		}
 		wv = activity.getWebView();
 		//Load the YTHtml.html file into the webview to create YouTube player
 		wv.loadDataWithBaseURL("http://localhost:8000/", activity.getHtml(data[0]), "text/html", "utf-8", null);

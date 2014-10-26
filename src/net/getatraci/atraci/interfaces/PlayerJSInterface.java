@@ -1,7 +1,10 @@
 package net.getatraci.atraci.interfaces;
 
+import net.getatraci.atraci.R;
 import net.getatraci.atraci.activities.PlayerFragment;
 import android.graphics.Point;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Display;
 import android.webkit.JavascriptInterface;
 
@@ -78,6 +81,12 @@ public class PlayerJSInterface {
 	@JavascriptInterface
 	public void setTitle(String title) {
 		player.setActionBarTitle(title);
+	}
+	
+	@JavascriptInterface
+	public String getQualityLevel() {
+		Log.d("ATRACI", PreferenceManager.getDefaultSharedPreferences(player.getActivity()).getString("quality", player.getResources().getStringArray(R.array.quality_values)[2]));
+		return PreferenceManager.getDefaultSharedPreferences(player.getActivity()).getString("quality", player.getResources().getStringArray(R.array.quality_values)[2] );
 	}
 
 }

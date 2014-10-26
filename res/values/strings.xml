@@ -11,6 +11,7 @@
     <string name="lyrics">Fetching lyrics!</string>
     <string name="drawer_open">Atraci</string>
     <string name="drawer_close">Closed</string>
+    <string name="quality_injection">player.getAvailableQualityLevels(player.getAvailableQualityLevels().length - 1)</string>
 
     <string-array name="navigation_items">
         <item>Home</item>
@@ -20,6 +21,16 @@
         <item>Now Playing</item>
         <item>Donate</item>
         <item>Settings</item>
+    </string-array>
+        <string-array name="quality_names">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>Best</item>
+    </string-array>
+    <string-array name="quality_values">
+        <item>small</item>
+        <item>large</item>
+        <item>@string/quality_injection</item>
     </string-array>
 
     <string name="play">Play</string>
@@ -45,5 +56,8 @@
     <string name="has_been_deleted">has been deleted!</string>
     <string name="loading">Loading</string>
     <string name="update_feed">Update Feed</string>
+    <string name="pk_quality">use_low_quality</string>
+    <string name="use_low_quality">Load videos with lower quality</string>
+    <string name="quality_desc">Reduce network usage by streaming lower quality videos.</string>
 
 </resources>
