@@ -73,6 +73,9 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	}
 
 	public void launchSongList(Bundle bundle) {
+		if(songlist == null){
+			songlist = new SongListFragment();
+		}
 		if(songlist.getActivity() == null){
 			songlist.setArguments(bundle);
 		} else {
