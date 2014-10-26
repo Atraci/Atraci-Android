@@ -20,14 +20,17 @@ public class QueueListAdapter extends BaseAdapter{
 	private LayoutInflater inflater;
 	
 	public QueueListAdapter(Context c, ArrayList<MusicItem> q, int p) {
+		super();
 		queue = q;
 		pos = p;
+		Log.d("ATRACI", "Queue Size: "+ q.size());
 		inflater = LayoutInflater.from(c);
 	}
 
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
+		Log.d("ATRACI", "Queued Size: "+ queue.size());
 		return queue.size();
 	}
 
@@ -56,14 +59,26 @@ public class QueueListAdapter extends BaseAdapter{
         
         name = (TextView)v.getTag(R.id.song);
         name.setText(queue.get(position).getTrack());
-        Log.d("ATRACI", "added " + queue.get(position));
         
         if(pos == position){
         	v.setBackgroundColor(Color.GRAY);
         } else {
         	v.setBackgroundColor(Color.WHITE);
         }
-        return view;
+        return v;
+	}
+
+	
+	
+	@Override
+	public boolean areAllItemsEnabled() {
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled(int position) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 	public ArrayList<MusicItem> getQueue() {

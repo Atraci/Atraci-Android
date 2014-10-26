@@ -23,7 +23,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,7 +78,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		Log.d("ATRACI","new instance state: " + Boolean.toString(savedInstanceState==null));
 		// Inflate the fragment layout
 		View view = inflater.inflate(R.layout.fragment_player,
 				container,
@@ -123,7 +121,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		query = bundle.getParcelableArrayList("values");
 		position = bundle.getInt("position");
 		q_adapter = new QueueListAdapter(getActivity(), query, position);
-		queue_list.setAdapter(q_adapter);
 		queue_list.setOnItemClickListener(this);
 		//Load the song to being playing
 		manager.initLoader(123, bundle, loader);
@@ -159,10 +156,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 //	@Override
 	public void loadNewBundle(Bundle bundle) {
 		HomeActivity.pager.setCurrentItem(1);
-		if(bundle.equals(this.bundle)){ //If this is the same thing, just switch back to the player
-			return;
-		}
-		
+	
 		this.bundle = bundle;
 		if(bundle != null) {
 			query = bundle.getParcelableArrayList("values");
@@ -611,6 +605,14 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 	public void setWv_frame(FrameLayout wv_frame) {
 		this.wv_frame = wv_frame;
+	}
+
+	public ListView getQueue_list() {
+		return queue_list;
+	}
+
+	public void setQueue_list(ListView queue_list) {
+		this.queue_list = queue_list;
 	}
 
 }

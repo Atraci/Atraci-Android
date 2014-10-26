@@ -51,7 +51,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-		Log.d("ATRACI", "Home on create()  " + Boolean.toString((savedInstanceState == null)));
 
 		pager = (ViewPager)findViewById(R.id.content_frame);
 		pager.setOffscreenPageLimit(2);

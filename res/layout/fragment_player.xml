@@ -120,17 +120,10 @@
             android:text="@string/shuffle" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/queue_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text="@string/lyrics" />
-
-<FrameLayout
- android:id="@+id/target_view"
- android:layout_width="match_parent"
- android:layout_height="match_parent"
- android:visibility="gone">
- </FrameLayout>
+        <ListView
+            android:id="@+id/queue_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/lyrics"/>
 
 </LinearLayout>
