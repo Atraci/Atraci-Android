@@ -8,5 +8,6 @@
         android:summary="@string/quality_desc"
         android:title="@string/use_low_quality"
         android:defaultValue="@string/quality_injection" />
+    <Preference android:summary="@string/clear_history_desc" android:key="clear_history" android:title="@string/clear_history"/>
 
 </PreferenceScreen>

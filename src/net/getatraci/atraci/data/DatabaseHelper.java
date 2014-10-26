@@ -82,6 +82,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 	}
 	
+	public void deleteHistory(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_HISTORY, null, null);
+	}
+	
 	public void addToHistory(MusicItem item){
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();

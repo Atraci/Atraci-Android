@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -168,7 +167,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 			break;
 
 		case 6:		//Settings item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment()).addToBackStack(null).commit();
+			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment(this)).addToBackStack(null).commit();
 			break;
 		}
 		// Set which item was selected in the nav drawer

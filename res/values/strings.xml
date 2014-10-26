@@ -59,5 +59,8 @@
     <string name="pk_quality">use_low_quality</string>
     <string name="use_low_quality">Load videos with lower quality</string>
     <string name="quality_desc">Reduce network usage by streaming lower quality videos.</string>
+    <string name="clear_history">Clear All History</string>
+    <string name="clear_history_desc">Deletes all songs that you have listened to.</string>
+    <string name="history_cleared">Song history cleared!</string>
 
 </resources>
