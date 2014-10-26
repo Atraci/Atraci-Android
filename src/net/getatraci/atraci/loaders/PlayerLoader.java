@@ -1,6 +1,8 @@
 package net.getatraci.atraci.loaders;
 
+import net.getatraci.atraci.activities.HomeActivity;
 import net.getatraci.atraci.activities.PlayerFragment;
+import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.json.JSONParser;
 
 import org.json.JSONException;
@@ -44,12 +46,14 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 			public String[] loadInBackground() {
 			String[] results = new String[3];
 				try {
+					MusicItem item = activity.getQuery().get(activity.getPosition());
+					HomeActivity.getDatabase().addToHistory(item);
 					//Get the ID from the full URL
-					results[0] = JSONParser.parseYoutube(activity.getQuery()[activity.getPosition()]);
+					results[0] = JSONParser.parseYoutube(item.getTrack() + " - " + item.getArtist());
 					//Get the lyrics 
 					//results[1] = JSONParser.getLyrics(artist, title);
 					//Get the full Youtube URL
-					results[2] = activity.getQuery()[activity.getPosition()]; 
+					results[2] = item.getTrack() + " - " + item.getArtist();
 					return results;
 				} catch (JSONException e) {
 					e.printStackTrace();

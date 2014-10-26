@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
@@ -50,7 +49,8 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	private ArrayList<MusicItem> results;
 	private boolean isPlaylist;
 	private int playlistID;
-	public static final String QUERY_TOP100= "Top 100 Songs";
+	public static final String QUERY_TOP100 = "Top 100 Songs";
+	public static final String QUERY_HISTORY = "History";
 	private Bundle bundle;
 
 	@Override
@@ -114,13 +114,14 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 						JSONObject obj = new JSONObject(json);
 						JSONArray array = obj.getJSONObject("feed").getJSONArray("entry");
 						results = JSONParser.getTop100FromJsonArray(array);
+					} else if(bundle.getString("query").equals(QUERY_HISTORY)){
+						results = HomeActivity.getDatabase().getHistory();
 					} else if(!isPlaylist) { //Load JSON if this is not a playlist 
 						String readJSON = JSONParser.getJSON(q);
 						JSONArray jsonArray = new JSONArray(readJSON);
 						results = JSONParser.getSongListFromJsonArray(jsonArray);
 					} else {
 						results = HomeActivity.getDatabase().getSongsFromPlaylist(playlistID);
-						HomeActivity.getDatabase().closeConnection();
 					}
 					return new SongListAdapter(getActivity(), results);
 				} catch (JSONException e) {
@@ -178,9 +179,10 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		
 	}
 
-	private void startPlayerActivity(String[] songs, int pos) {
+	private void startPlayerActivity(ArrayList<MusicItem> songs, int pos) {
 		Bundle bundle = new Bundle();
-		bundle.putStringArray("values", songs);
+		//bundle.putStringArray("values", songs);
+		bundle.putParcelableArrayList("values", songs);
 		bundle.putInt("position", pos);
 		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
 	}
@@ -195,37 +197,29 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	}
 
 	@Override
-	public void onLoaderReset(Loader<SongListAdapter> loader) {
-	}
-
-	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		GridView grid = (GridView)adapter.findViewById(R.id.gridview);
 
-		String[] songs = new String[grid.getAdapter().getCount()];
-		for(int i = 0; i < grid.getAdapter().getCount(); i++) {
-			MusicItem mi = ((MusicItem)grid.getAdapter().getItem(i));
-			songs[i] = mi.getArtist() + " - " + mi.getTrack();
-		}
-		startPlayerActivity(songs, position);	
+//		ArrayList<MusicItem> songs = new ArrayList<MusicItem>();
+//		for(int i = 0; i < grid.getAdapter().getCount(); i++) {
+//			MusicItem mi = ((MusicItem)grid.getAdapter().getItem(i));
+//			songs.add(mi);
+//		}
+		HomeActivity.getDatabase().addToHistory((MusicItem)grid.getAdapter().getItem(position));
+		startPlayerActivity(results, position);	
 	}
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view,
 			int position, long id) {
 		
-        Animation animationY = new ScaleAnimation(1,(float)0.5, 1,(float)0.5, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
-        animationY.setDuration(700);
-        animationY.setFillEnabled(true);
-        animationY.setFillAfter(true);
-        view.startAnimation(animationY);  
-        
-        animationY = null;
+		doAnimation(view, false);
 		ArrayList<Playlists> plists = HomeActivity.getDatabase().getAllPlaylists();
 		String[] names = new String[plists.size()];
 		
 		if(plists.size() == 0) {
 			Toast.makeText(getActivity(), getString(R.string.no_playlists_found), Toast.LENGTH_LONG).show();
+			doAnimation(view, true);
 			return true;
 		}
 		
@@ -252,12 +246,7 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		builder.setItems(playlists, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int pos) {
 				boolean result = HomeActivity.getDatabase().addSongToPlaylist(playlists[pos], item);
-	            Animation animationY = new ScaleAnimation((float)0.5, 1, (float)0.5, 1, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
-	            animationY.setDuration(700);
-	            animationY.setFillEnabled(true);
-	            animationY.setFillAfter(true);
-	            view.startAnimation(animationY);  
-	            animationY = null;
+				doAnimation(view, true);
 	            
 				if(!result) {
 					Toast.makeText(getActivity(), getString(R.string.unexpected_error), Toast.LENGTH_LONG).show();
@@ -294,15 +283,28 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	      } });
 	    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) {
-	            Animation animationY = new ScaleAnimation((float)0.5, 1, (float)0.5, 1, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
-	            animationY.setDuration(700);
-	            animationY.setFillEnabled(true);
-	            animationY.setFillAfter(true);
-	            view.startAnimation(animationY);  
-	            animationY = null;
-	            getActivity().finish();
+	            doAnimation(view, true);
 	      } });
 	    return builder.create();
+	}
+	
+	private static void doAnimation(View view, boolean zoomOut){
+        Animation animation = null;
+        if(!zoomOut){
+        	animation = new ScaleAnimation(1,(float)0.5, 1,(float)0.5, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+        } else {
+        	animation = new ScaleAnimation((float)0.5, 1, (float)0.5, 1, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
+        }
+        animation.setDuration(700);
+        animation.setFillEnabled(true);
+        animation.setFillAfter(true);
+        view.startAnimation(animation); 
+	}
+
+	@Override
+	public void onLoaderReset(Loader<SongListAdapter> loader) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

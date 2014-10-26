@@ -229,7 +229,6 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 	    builder.setPositiveButton("Do It!", new DialogInterface.OnClickListener() {
 	        public void onClick(DialogInterface dialog, int which) {
 	    		database.deletePlaylist(p.getId());
-	    		HomeActivity.getDatabase().closeConnection();
 	            	Toast.makeText(getActivity(), getString(R.string.song_delete_successful), Toast.LENGTH_SHORT).show();
 	                Animation animationY = new ScaleAnimation(1,0, 1, 0, Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0);
 	                animationY.setDuration(700);

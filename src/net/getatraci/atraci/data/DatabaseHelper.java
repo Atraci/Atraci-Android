@@ -11,10 +11,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Atraci";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
 	
     private static final String TABLE_PLAYLISTS = "playlists";
     private static final String TABLE_SONGS = "songs";
+    private static final String TABLE_HISTORY = "history";
     
     //Primary Keys
     private static final String KEY_ID = "id";
@@ -27,6 +28,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String SONGS_COVER_LARGE = "cover_large";
     private static final String SONGS_COVER_MED = "cover_med";
     private static final String SONGS_TIME_ADDED = "time_added";
+    private static final String HISTORY_LINK = "link";
+    private static final String HISTORY_ARTIST = "artist";
+    private static final String HISTORY_TITLE = "title";
+    private static final String HISTORY_COVER_LARGE = "cover_large";
+    private static final String HISTORY_COVER_MED = "cover_med";
+    private static final String HISTORY_TIME_ADDED = "time_added";
     
     //Table creation strings
     private static final String CREATE_TABLE_PLAYLISTS = "CREATE TABLE " 
@@ -44,6 +51,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     										+ SONGS_COVER_MED + " TEXT,"
     										+ SONGS_TIME_ADDED + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
     										+/* "FOREIGN KEY("+ KEY_ID + ") REFERENCES "+ TABLE_PLAYLISTS +"("+ KEY_ID +  ")*/");";
+    
+    private static final String CREATE_TABLE_HISTORY = "CREATE TABLE " + TABLE_HISTORY + "("
+											    		+ HISTORY_LINK + " TEXT," 
+														+ HISTORY_ARTIST + " TEXT," 
+														+ HISTORY_TITLE + " TEXT,"
+														+ HISTORY_COVER_LARGE + " TEXT,"
+														+ HISTORY_COVER_MED + " TEXT,"
+														+ HISTORY_TIME_ADDED + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
+														+ "PRIMARY KEY ("+HISTORY_ARTIST+","+HISTORY_TITLE+"));";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -53,15 +69,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_PLAYLISTS);
         db.execSQL(CREATE_TABLE_SONGS);
+        db.execSQL(CREATE_TABLE_HISTORY);
     }
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PLAYLISTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SONGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
         //Recreate the tables
         onCreate(db);
 		
+	}
+	
+	public void addToHistory(MusicItem item){
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(HISTORY_ARTIST, item.getArtist());
+		values.put(HISTORY_TITLE, item.getTrack());
+		values.put(HISTORY_LINK, item.getYoutube());
+		values.put(HISTORY_COVER_MED, item.getImage_med());
+		values.put(HISTORY_COVER_LARGE, item.getImage_lrg());
+		db.replace(TABLE_HISTORY, null, values);
+		db.close();
+	}
+	
+	public ArrayList<MusicItem> getHistory() {
+		ArrayList<MusicItem> songs = new ArrayList<MusicItem>();
+		SQLiteDatabase db = this.getReadableDatabase();
+		String query = "SELECT * FROM " + TABLE_HISTORY + " ORDER BY " + HISTORY_TIME_ADDED;
+		
+		Cursor c = db.rawQuery(query, null);
+		if(!c.moveToFirst()) {
+			db.close();
+			return songs;
+		}
+		
+		do {
+			MusicItem item = new MusicItem();
+			item.setYoutube(c.getString(c.getColumnIndex(SONGS_LINK)));
+			item.setArtist(c.getString(c.getColumnIndex(SONGS_ARTIST)));
+			item.setTrack(c.getString(c.getColumnIndex(SONGS_TITLE)));
+			item.setYoutube(c.getString(c.getColumnIndex(SONGS_LINK)));
+			item.setImage_lrg(c.getString(c.getColumnIndex(SONGS_COVER_LARGE)));
+			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
+			songs.add(item);
+		} while(c.moveToNext());
+		db.close();
+		return songs;
 	}
 	
 	public long createPlaylist(String playlist) {
@@ -69,8 +124,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		ContentValues values = new ContentValues();
 		values.put(PLAYLISTS_NAME, playlist);
-		
-		return db.insert(TABLE_PLAYLISTS, null, values);
+		long result = db.insert(TABLE_PLAYLISTS, null, values);
+		db.close();
+		return result;
 	}
 	
 	public void deletePlaylist(int id) {
@@ -78,12 +134,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		db.delete(TABLE_SONGS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
 		db.delete(TABLE_PLAYLISTS, KEY_ID + " = ?", new String[]{Integer.toString(id)});
+		db.close();
 	}
 	
 	public int deleteSongFromPlaylistByLink(String id, String title) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		
-		return db.delete(TABLE_SONGS, SONGS_TITLE + " = ? AND " + KEY_ID + " = ?", new String[]{title, id});
+		int result = db.delete(TABLE_SONGS, SONGS_TITLE + " = ? AND " + KEY_ID + " = ?", new String[]{title, id});
+		db.close();
+		return result;
 	}
 	
 	public Playlists getPlaylistByName(String playlist_name) {
@@ -94,10 +152,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(query, null);
 		
 		if(c == null || !c.moveToFirst()) {
+			db.close();
 			return new Playlists();
 		}
 		
 		Playlists playlist = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
+		db.close();
 		return playlist;
 	}
 	
@@ -113,6 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 		
 		Playlists playlist = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
+		db.close();
 		return playlist;
 	}
 	
@@ -125,6 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(query, null);
 		
 		if(c == null || !c.moveToFirst()) {
+			db.close();
 			return playlists;
 		}
 		
@@ -132,7 +194,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			Playlists p = new Playlists(c.getInt(c.getColumnIndex(KEY_ID)), c.getString(c.getColumnIndex(PLAYLISTS_NAME)));
 			playlists.add(p);
 		} while(c.moveToNext());
-		
+		db.close();
 		return playlists;
 	}
 	
@@ -143,6 +205,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		Cursor c = db.rawQuery(query, new String[]{Integer.toString(id)});
 		if(!c.moveToFirst()) {
+			db.close();
 			return playlists;
 		}
 		
@@ -156,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
 			playlists.add(item);
 		} while(c.moveToNext());
-
+		db.close();
 		return playlists;
 	}
 	
@@ -172,14 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(SONGS_COVER_MED, item.getImage_med());
 		
 		long result = db.insert(TABLE_SONGS, null, values);
-		closeConnection(); //Close the connection we opened in this function
+		db.close();
 		return (result > 0 ? true : false);
-	}
-	
-	public void closeConnection() {
-		SQLiteDatabase db = this.getReadableDatabase();
-		if (db != null && db.isOpen()) {
-			db.close();
-		}
 	}
 }

@@ -2,11 +2,13 @@ package net.getatraci.atraci.activities;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
 import net.getatraci.atraci.json.JSONParser;
 import net.getatraci.atraci.loaders.PlayerLoader;
@@ -56,7 +58,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private ListView queue_list;
 	private FrameLayout wv_frame;
 	private WebView wv;	// The webview that contains the HTML file of the video viewer 
-	private String[] query; // The list to be stored from the bundle containing songs
+	private ArrayList<MusicItem> query; // The list to be stored from the bundle containing songs
 	private Notification notification; // Notification for the notification drawer
 	private NotificationManager mNotifyMgr; // Manager that handles the notification
 	private static final int NOTIFY_ID=1; //ID of the notification
@@ -118,7 +120,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		else if(bundle == null){
 			bundle = savedInstanceState.getBundle("oldBundle");
 		}
-		query = bundle.getStringArray("values");
+		query = bundle.getParcelableArrayList("values");
 		position = bundle.getInt("position");
 		q_adapter = new QueueListAdapter(getActivity(), query, position);
 		queue_list.setAdapter(q_adapter);
@@ -163,7 +165,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		
 		this.bundle = bundle;
 		if(bundle != null) {
-			query = bundle.getStringArray("values");
+			query = bundle.getParcelableArrayList("values");
 			position = bundle.getInt("position");
 			stopVideo();
 			mLoader = manager.restartLoader(123, bundle, loader);
@@ -299,9 +301,9 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 				if(position < 0) {
 					position = 0;
-				} else if(repeat && position >= query.length) {
+				} else if(repeat && position >= query.size()) {
 					position = 0;
-				} else if(!repeat && position >= query.length) {
+				} else if(!repeat && position >= query.size()) {
 					return;
 				}
 				//Get the new song and begin playing
@@ -508,7 +510,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	 * Gets the list of songs
 	 * @return
 	 */
-	public String[] getQuery() {
+	public ArrayList<MusicItem> getQuery() {
 		return query;
 	}
 
@@ -553,7 +555,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private int getRandomIndex() {
 		Random r = new Random();
 		r.setSeed(System.nanoTime()*System.currentTimeMillis());
-		int i = r.nextInt(query.length-1);
+		int i = r.nextInt(query.size()-1);
 
 		if(i != position) {
 			return i;

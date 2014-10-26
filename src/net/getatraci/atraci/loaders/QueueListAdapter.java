@@ -1,6 +1,9 @@
 package net.getatraci.atraci.loaders;
 
+import java.util.ArrayList;
+
 import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.MusicItem;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
@@ -12,11 +15,11 @@ import android.widget.TextView;
 
 public class QueueListAdapter extends BaseAdapter{
 	
-	private String[] queue;
+	private ArrayList<MusicItem> queue;
 	private int pos;
 	private LayoutInflater inflater;
 	
-	public QueueListAdapter(Context c, String[] q, int p) {
+	public QueueListAdapter(Context c, ArrayList<MusicItem> q, int p) {
 		queue = q;
 		pos = p;
 		inflater = LayoutInflater.from(c);
@@ -25,13 +28,13 @@ public class QueueListAdapter extends BaseAdapter{
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return queue.length;
+		return queue.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
 		// TODO Auto-generated method stub
-		return queue[position];
+		return queue.get(position);
 	}
 
 	@Override
@@ -52,8 +55,8 @@ public class QueueListAdapter extends BaseAdapter{
         }
         
         name = (TextView)v.getTag(R.id.song);
-        name.setText(queue[position]);
-        Log.d("ATRACI", "added " + queue[position]);
+        name.setText(queue.get(position).getTrack());
+        Log.d("ATRACI", "added " + queue.get(position));
         
         if(pos == position){
         	v.setBackgroundColor(Color.GRAY);
@@ -63,11 +66,11 @@ public class QueueListAdapter extends BaseAdapter{
         return view;
 	}
 
-	public String[] getQueue() {
+	public ArrayList<MusicItem> getQueue() {
 		return queue;
 	}
 
-	public void setQueue(String[] queue) {
+	public void setQueue(ArrayList<MusicItem> queue) {
 		this.queue = queue;
 	}
 

@@ -23,6 +23,16 @@ public class MusicItem implements Parcelable {
 		
 	}
 	
+	public MusicItem(Parcel p){
+		image_med = p.readString();
+		image_lrg = p.readString();
+		youtube = p.readString();
+		artist = p.readString();
+		album = p.readString();
+		track = p.readString();
+		type = p.readInt();
+	}
+	
 	public MusicItem(String i, String item, int type) {
 		image_med = i;
 		
@@ -92,12 +102,24 @@ public class MusicItem implements Parcelable {
 	@Override
 	public void writeToParcel(Parcel arg0, int arg1) {
 		arg0.writeString(image_med);
+		arg0.writeString(image_lrg);
+		arg0.writeString(youtube);
 		arg0.writeString(artist);
 		arg0.writeString(album);
 		arg0.writeString(track);
 		arg0.writeInt(type);
 		
 	}
+	
+	public static final Parcelable.Creator<MusicItem> CREATOR = new Parcelable.Creator<MusicItem>() {
+	    public MusicItem createFromParcel(Parcel in) {
+	        return new MusicItem(in);
+	    }
+
+	    public MusicItem[] newArray(int size) {
+	        return new MusicItem[size];
+	    }
+	};
 
 	public String getYoutube() {
 		return youtube;

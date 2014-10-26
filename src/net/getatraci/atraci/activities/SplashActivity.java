@@ -16,16 +16,14 @@ public class SplashActivity extends Activity {
 	       new Handler().postDelayed(new Runnable() {
 	    	   
 	            /*
-	             * Showing splash screen with a timer. This will be useful when you
-	             * want to show case your app logo / company
+	             * Showing splash screen with a timer.
 	             */
 	 
 	            @Override
 	            public void run() {
-	                // This method will be executed once the timer is over
-	                // Start your app main activity
 	                Intent i = new Intent(SplashActivity.this, HomeActivity.class);
 	                startActivity(i);
+	                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 	 
 	                // close this activity
 	                finish();

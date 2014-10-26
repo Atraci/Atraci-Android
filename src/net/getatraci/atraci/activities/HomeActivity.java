@@ -7,7 +7,10 @@ import net.getatraci.atraci.data.DatabaseHelper;
 import net.getatraci.atraci.loaders.PagerFragmentAdapter;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.ViewPager;
@@ -50,32 +53,32 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		setContentView(R.layout.activity_home);
 		Log.d("ATRACI", "Home on create()  " + Boolean.toString((savedInstanceState == null)));
 
-			pager = (ViewPager)findViewById(R.id.content_frame);
-			pager.setOffscreenPageLimit(2);
-			pageAdapter = new PagerFragmentAdapter(this.getFragmentManager());
-			pager.setAdapter(pageAdapter);
-			database = new DatabaseHelper(this.getApplicationContext());
-			mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
-			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-			mDrawerList = (ListView) findViewById(R.id.left_drawer);
-			mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.navigation_bar_item, mNavigationDrawerItemTitles));
-			mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+		pager = (ViewPager)findViewById(R.id.content_frame);
+		pager.setOffscreenPageLimit(2);
+		pageAdapter = new PagerFragmentAdapter(this.getFragmentManager());
+		pager.setAdapter(pageAdapter);
+		database = new DatabaseHelper(this.getApplicationContext());
+		mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_items);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.navigation_bar_item, mNavigationDrawerItemTitles));
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
 
-				/** Called when a drawer has settled in a completely closed state. */
-				public void onDrawerClosed(View view) {
-					super.onDrawerClosed(view);
-				}
+			/** Called when a drawer has settled in a completely closed state. */
+			public void onDrawerClosed(View view) {
+				super.onDrawerClosed(view);
+			}
 
-				/** Called when a drawer has settled in a completely open state. */
-				public void onDrawerOpened(View drawerView) {
-					super.onDrawerOpened(drawerView);
-				}
-			};
+			/** Called when a drawer has settled in a completely open state. */
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+			}
+		};
 
-			// Set the drawer toggle as the DrawerListener
-			mDrawerLayout.setDrawerListener(mDrawerToggle);
-			// Set the click listener to the callbacks in this Activity
-			mDrawerList.setOnItemClickListener(this);	
+		// Set the drawer toggle as the DrawerListener
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		// Set the click listener to the callbacks in this Activity
+		mDrawerList.setOnItemClickListener(this);	
 		// Make the AppIcon clickable
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		// Allow user to tap the appicon
@@ -119,6 +122,8 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	
 
 	/* Called when configuration has changed. Ex: when screen rotated */
 	@Override
@@ -135,7 +140,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		}
 		pager.setCurrentItem(0);
 		mDrawerLayout.closeDrawers();
-		getFragmentManager().beginTransaction().replace(R.id.root_frame, search).addToBackStack(null).commit();
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, search).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).addToBackStack(null).commit();
 	}
 
 	/* Listener for when user clicks an item in the Navigation Drawer */
@@ -152,15 +157,18 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 			break;
 		case 2:		// Playlists items clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new PlaylistSelectorFragment(database)).addToBackStack("playlists").commit();
-			getActionBar().setTitle(getResources().getString(R.string.playlists));
 			break;
-		case 3:		//Now playing item clicked
+		case 3:		// History item clicked
+			launchHistory();
+			break;
+		case 4:		//Now playing item clicked
 			pager.setCurrentItem(1);
 			break;	
-		case 4:		//Donate item clicked
+		case 5:		//Donate item clicked
+			launchDonate();
 			break;
 
-		case 5:		//Settings item clicked
+		case 6:		//Settings item clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment()).addToBackStack(null).commit();
 			break;
 		}
@@ -170,10 +178,30 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		mDrawerLayout.closeDrawer(mDrawerList);
 
 	}
+	
+	private void launchDonate() {
+		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q9SDPBK7VMQ8N"));
+		startActivity(browserIntent);
+	}
 
 	private void launchTop100() {
 		Bundle bundle = new Bundle();
 		bundle.putString("query", SongListFragment.QUERY_TOP100);
+		bundle.putBoolean("isPlaylist", false);
+		if(songlist == null){
+			songlist = new SongListFragment();
+		}
+		if(songlist.getActivity() == null){
+			songlist.setArguments(bundle);
+		} else {
+			songlist.setBundle(bundle);
+		}
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).addToBackStack(null).commit();
+	}
+
+	private void launchHistory(){
+		Bundle bundle = new Bundle();
+		bundle.putString("query", SongListFragment.QUERY_HISTORY);
 		bundle.putBoolean("isPlaylist", false);
 		if(songlist == null){
 			songlist = new SongListFragment();
