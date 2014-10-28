@@ -1,6 +1,7 @@
 package net.getatraci.atraci.activities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
@@ -116,6 +117,7 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 						results = JSONParser.getTop100FromJsonArray(array);
 					} else if(bundle.getString("query").equals(QUERY_HISTORY)){
 						results = HomeActivity.getDatabase().getHistory();
+						Collections.reverse(results);
 					} else if(!isPlaylist) { //Load JSON if this is not a playlist 
 						String readJSON = JSONParser.getJSON(q);
 						JSONArray jsonArray = new JSONArray(readJSON);
