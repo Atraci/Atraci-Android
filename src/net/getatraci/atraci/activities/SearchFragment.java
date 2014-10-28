@@ -12,12 +12,14 @@ import net.getatraci.atraci.loaders.LFMArrayAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,9 +27,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -98,8 +102,14 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
 
 		searchView.setOnQueryTextListener(this);
-
+		EditText searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
+		searchField.setTextColor(Color.LTGRAY);
+		searchField.setHintTextColor(Color.RED);
+		searchField.setHint(getResources().getString(R.string.seach_hint));
+		searchField.setFocusable(true);
+		searchField.requestFocus();
 		searchView.setIconifiedByDefault(false);
+		showKeyBoard(getActivity());
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -108,7 +118,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		LFMArrayAdapter adapt = (LFMArrayAdapter) list.getAdapter();
 		MusicItem mi = adapt.getItem(position);
 		Bundle extras = new Bundle();
-		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack()).trim()+"");
+		extras.putString("query", ("" + mi.getArtist() + " " + mi.getAlbum() + " " + mi.getTrack())+"");
 		extras.putBoolean("isPlaylist", false);
 		launchSongList(extras);
 	}
@@ -221,6 +231,17 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		bundle.putString("query", text);
 		bundle.putBoolean("isPlaylist", false);
 		launchSongList(bundle);
+		hideKeyBoard(getActivity());
 		return true;
+	}
+	
+	public static void hideKeyBoard(Activity activity){
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),0);
+	}
+	
+	public static void showKeyBoard(Activity activity){
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 	}
 }
