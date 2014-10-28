@@ -13,8 +13,10 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 /**
  * This Activity is the main activity loaded once the application opens.
@@ -39,6 +42,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	private ActionBarDrawerToggle mDrawerToggle;  	 //Toggle on App Icon to open nav drawer
 	private static DatabaseHelper database;
 	public static ViewPager pager;
+	private boolean confirmExit = false;
 	static PagerFragmentAdapter pageAdapter;
 	SearchFragment search;
 	PlaylistSelectorFragment playlists;
@@ -120,8 +124,42 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Log.d("ATRACI", "onPause()");
+	};
+
+
+
+	@Override
+	public void onBackPressed() {
+		if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+			mDrawerLayout.closeDrawers();
+		}
+		else if(pager.getCurrentItem() == 1){
+			pager.setCurrentItem(0);
+			confirmExit = false;
+		}
+		else if(getFragmentManager().getBackStackEntryCount() > 0) {
+			try {
+				getFragmentManager().popBackStack();
+				confirmExit = false;
+			} catch (IllegalStateException e) {
+
+			}
+		}
+		else {
+			if(confirmExit){
+				database.closeDatabaseConnection();
+				finish();
+			} else {
+				confirmExit = true;
+				Toast.makeText(this, "Press back again to exit Atraci.", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
 
 	/* Called when configuration has changed. Ex: when screen rotated */
 	@Override
@@ -176,7 +214,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		mDrawerLayout.closeDrawer(mDrawerList);
 
 	}
-	
+
 	private void launchDonate() {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=Q9SDPBK7VMQ8N"));
 		startActivity(browserIntent);
