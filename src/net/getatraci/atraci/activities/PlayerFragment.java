@@ -24,6 +24,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -140,6 +141,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Start listening for button presses
 		am.registerMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
+		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 	}
 	
 	@Override

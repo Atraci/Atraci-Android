@@ -18,7 +18,11 @@ public class RemoteControlReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final PlayerFragment player = (PlayerFragment)((PagerFragmentAdapter)HomeActivity.pager.getAdapter()).getRegisteredFragment(1);
-		if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
+		Log.d("ATRACI", intent.getAction().toString());
+		if(Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())){
+			player.pauseVideo();
+		}
+		else if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
 			KeyEvent event = (KeyEvent)intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 			Log.d("ATRACI", "Media Key Pressed: " +event.getKeyCode());
 			if (KeyEvent.KEYCODE_MEDIA_PLAY == event.getKeyCode()) {
