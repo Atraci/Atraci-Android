@@ -5,7 +5,6 @@
 
     <script>
       var tag = document.createElement('script');
-
       tag.src = "https://www.youtube.com/iframe_api";
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
@@ -28,8 +27,6 @@
       function onPlayerReady(event) {
       		player.setPlaybackQuality(JSInt.getQualityLevel());
       		player.stopVideo();
-      		player.playVideo();
-      		player.pauseVideo();
   			JSInt.onPlayerReady();
   			JSInt.setTitle(player.getVideoData().title);
       }
@@ -67,6 +64,7 @@
       function getLength() {
         player.getDuration();
       }
+      
       function getCurrentTime() {
       	return Math.round(player.getCurrentTime());
       }

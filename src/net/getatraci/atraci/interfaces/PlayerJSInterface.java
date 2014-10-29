@@ -39,7 +39,14 @@ public class PlayerJSInterface {
 	
 	@JavascriptInterface
 	public void onPlayerReady() {
-		player.playVideo();
+	//	player.playVideo();
+	}
+	
+	@JavascriptInterface
+	public void forceLoad(){
+		if(!player.getWebView().isShown()){
+			player.getLoaderManager().getLoader(123).forceLoad();
+		}
 	}
 	
 	@JavascriptInterface
@@ -47,9 +54,9 @@ public class PlayerJSInterface {
 		Display display = player.getActivity().getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		return player.getWv_frame().getWidth();
+		//return player.getWv_frame().getWidth();
 		
-		//return player.getWebView().getWidth();
+		return player.getWebView().getWidth();
 	}
 	
 	@JavascriptInterface
@@ -57,7 +64,8 @@ public class PlayerJSInterface {
 		Display display = player.getActivity().getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		return player.getWv_frame().getHeight();
+		//return player.getWv_frame().getHeight();
+		return player.getWebView().getHeight();
 	}
 	
 	@JavascriptInterface
@@ -67,14 +75,8 @@ public class PlayerJSInterface {
 	}
 	
 	@JavascriptInterface
-	public int getTimePlayed() {
-		return player.getTimePlayed();
-	}
-	
-	@JavascriptInterface
 	public void setVideoTime(int time) {
 		player.getSeekBar().setProgress(time);
-		player.setTimePlayed(time);
 		player.setTimeViewTime(time);
 	}
 	
@@ -85,8 +87,12 @@ public class PlayerJSInterface {
 	
 	@JavascriptInterface
 	public String getQualityLevel() {
-		Log.d("ATRACI", PreferenceManager.getDefaultSharedPreferences(player.getActivity()).getString("quality", player.getResources().getStringArray(R.array.quality_values)[2]));
 		return PreferenceManager.getDefaultSharedPreferences(player.getActivity()).getString("quality", player.getResources().getStringArray(R.array.quality_values)[2] );
+	}
+	
+	@JavascriptInterface
+	public void pushToLog(String text){
+		Log.d("ATRACI", text);
 	}
 
 }

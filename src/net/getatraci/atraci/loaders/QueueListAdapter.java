@@ -6,14 +6,10 @@ import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class QueueListAdapter extends BaseAdapter{
@@ -26,26 +22,21 @@ public class QueueListAdapter extends BaseAdapter{
 		super();
 		queue = q;
 		pos = p;
-		Log.d("ATRACI", "Queue Size: "+ q.size());
 		inflater = LayoutInflater.from(c);
 	}
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
-		Log.d("ATRACI", "Queued Size: "+ queue.size());
 		return queue.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
 		return queue.get(position);
 	}
 
 	@Override
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

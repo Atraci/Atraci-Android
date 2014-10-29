@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
+import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
 import net.getatraci.atraci.loaders.PlayerLoader;
 import net.getatraci.atraci.loaders.QueueListAdapter;
@@ -20,9 +21,13 @@ import android.app.LoaderManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,7 +76,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private LoaderManager manager;
 	private Loader<String[]> mLoader;
 	private QueueListAdapter q_adapter;
-	private int timePlayed;
 	private Bundle bundle;
 
 	@Override
@@ -85,11 +89,8 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		manager = getLoaderManager();
 		loader = new PlayerLoader(this);
 		mNotifyMgr = (NotificationManager) getActivity().getSystemService(Activity.NOTIFICATION_SERVICE);
-		wv = (WebView)view.findViewById(R.id.youtube_view);
-		if(savedInstanceState != null) {
-			wv.restoreState(savedInstanceState);
-			timePlayed = savedInstanceState.getInt("timeplayed");
-		}
+		//wv = (CustomWebView)view.findViewById(R.id.youtube_view);
+		wv = new WebView(getActivity());
 		setUpWebview();
 
 		play_button = (ImageButton)view.findViewById(R.id.playbut);
@@ -102,7 +103,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		total_time = (TextView)view.findViewById(R.id.total_time);
 		queue_list = (ListView)view.findViewById(R.id.queue_list);
 		wv_frame = (FrameLayout) view.findViewById(R.id.webview_frame);
-
+		wv_frame.addView(wv);
 		//Load button action listeners
 		setPlayButtonOnClick();
 		setPrevButtonOnClick();
@@ -112,7 +113,12 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		setSeekbarOnChange();
 		//Get data from the bundle
 		bundle = getArguments();
-		if(bundle == null && savedInstanceState == null){
+		if(bundle == null && savedInstanceState == null){ //If nothing has been sent to the player, lets simply load their history
+			query = HomeActivity.getDatabase().getHistory();
+			position = 0;
+			q_adapter = new QueueListAdapter(getActivity(), query, position);
+			queue_list.setOnItemClickListener(this);
+			mLoader = manager.restartLoader(123, bundle, loader);
 			return view;
 		}
 		else if(bundle == null){
@@ -131,13 +137,30 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+		// Start listening for button presses
+		am.registerMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
+	}
+	
+	@Override
+	public void onDestroyView() {
+		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+		// Stop listening for button presses
+		am.unregisterMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
+		super.onDestroyView();
+	};
+	
+	
+
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState) {
+		Log.d("ATRACI", "view state restored");
+		super.onViewStateRestored(savedInstanceState);
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		wv.saveState(outState);
 		outState.putBundle("oldBundle", bundle);
-		outState.putInt("timeplayed", timePlayed);
 		if(timer != null){
 			timer.cancel();
 		}
@@ -168,6 +191,13 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		}
 	}
 
+	
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		startTimer();
+	}
 
 	@Override
 	public void onDestroy() {
@@ -334,7 +364,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	 */
 	public void stopVideo() {
 		videoOver = true;
-		timePlayed = 0;
 		if(getActivity() == null){
 			return;
 		}
@@ -362,15 +391,22 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				Log.d("ATRACI", "playVideo()");
 				wv.loadUrl("javascript:playVideo()");
 				play_button.setImageResource(R.drawable.ic_action_pause);
 				reshowLastNotification();
 				startTimer();
 				playing = true;
+		        //Create a notification with the song information
+				MusicItem current = query.get(position);
+		        showNotification(current.toString(), "Now Playing", current.toString());
 			}});
 	}
 
 	public void startTimer() {
+		if(timer != null){
+			timer.cancel();
+		}
 		if(getActivity() == null){
 			return;
 		}
@@ -458,7 +494,9 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	 * Reshows last notification that was created
 	 */
 	public void reshowLastNotification() {
+		if(notification != null){
 		mNotifyMgr.notify(NOTIFY_ID, notification);
+		}
 	}
 
 	/**
@@ -593,14 +631,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 	}
 
-	public int getTimePlayed() {
-		return timePlayed;
-	}
-
-	public void setTimePlayed(int timePlayed) {
-		this.timePlayed = timePlayed;
-	}
-
 	public FrameLayout getWv_frame() {
 		return wv_frame;
 	}
@@ -615,6 +645,10 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 	public void setQueue_list(ListView queue_list) {
 		this.queue_list = queue_list;
+	}
+	
+	public boolean isPlaying(){
+		return playing;
 	}
 
 }

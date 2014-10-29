@@ -131,7 +131,7 @@ public class MusicItem implements Parcelable {
 	
 	@Override
 	public String toString() {
-		return "Track: " + track + "  Album: " + album + "  Artist: " + artist;
+		return track + " - " + artist;
 	}
 
 	public String getImage_lrg() {

@@ -12,6 +12,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 
 /**
@@ -24,7 +25,7 @@ import android.webkit.WebView;
 
 public class PlayerLoader implements LoaderCallbacks<String[]> {
 	
-	private PlayerFragment activity;
+	private PlayerFragment mPlayer;
 	private WebView wv;
 	
 	/**
@@ -32,7 +33,7 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 	 * @param player the instance of the player class that called the loader
 	 */
 	public PlayerLoader(PlayerFragment player) {
-		activity = player;
+		mPlayer = player;
 	}
 	
 	/**
@@ -40,19 +41,18 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 	 * This includes: Video ID, Lyrics String, Full content URL
 	 */
 	public Loader<String[]> onCreateLoader(int id, Bundle args) {
-		return new AsyncTaskLoader<String[]>(activity.getActivity()) {
+		return new AsyncTaskLoader<String[]>(mPlayer.getActivity()) {
 			String[] data;
 			@Override
 			public String[] loadInBackground() {
 			String[] results = new String[3];
 				try {
-					MusicItem item = activity.getQuery().get(activity.getPosition());
+					MusicItem item = mPlayer.getQuery().get(mPlayer.getPosition());
 					HomeActivity.getDatabase().addToHistory(item);
 					//Get the ID from the full URL
 					results[0] = JSONParser.parseYoutube(item.getTrack() + " - " + item.getArtist());
 					//Get the lyrics 
 					//results[1] = JSONParser.getLyrics(artist, title);
-					//Get the full Youtube URL
 					results[2] = item.getTrack() + " - " + item.getArtist();
 					return results;
 				} catch (JSONException e) {
@@ -65,7 +65,7 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 			@Override
 			public void deliverResult(String[] data) {
 				this.data = data;
-				if(activity.isVideoOver()) {
+				if(mPlayer.isVideoOver()) {
 					onLoadFinished(null, data);
 					//super.deliverResult(data);
 				}
@@ -102,20 +102,18 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public void onLoadFinished(Loader<String[]> loader, String[] data) {
-		activity.getQueue_list().setAdapter(new QueueListAdapter(activity.getActivity(), activity.getQuery(), activity.getPosition()));
-		if(activity.getPosition() > 3){
-		activity.getQueue_list().setSelection(activity.getPosition()-2);
+		mPlayer.getQueue_list().setAdapter(new QueueListAdapter(mPlayer.getActivity(), mPlayer.getQuery(), mPlayer.getPosition()));
+		Log.d("ATRACI", "load finished");
+		if(mPlayer.getPosition() > 3){
+		mPlayer.getQueue_list().setSelection(mPlayer.getPosition()-2);
 		}
-		wv = activity.getWebView();
+		wv = mPlayer.getWebView();
 		//Load the YTHtml.html file into the webview to create YouTube player
-		wv.loadDataWithBaseURL("http://localhost:8000/", activity.getHtml(data[0]), "text/html", "utf-8", null);
-		//Set the lyrics and make them scrollable
-//		TextView tv = (TextView)activity.findViewById(R.id.lyrics_box);
-//        tv.setMovementMethod(new ScrollingMovementMethod());
-//        tv.setText(data[1]);  
-        //Create a notification with the song information
-        activity.showNotification(data[2], "Now Playing", data[2]);
-        activity.setVideoOver(false);
+		wv.loadDataWithBaseURL("http://localhost:8000/", mPlayer.getHtml(data[0]), "text/html", "utf-8", null);
+        mPlayer.setVideoOver(false);
+        if(mPlayer.isPlaying()){
+        	mPlayer.playVideo();
+        }
 	}
 
 	@Override

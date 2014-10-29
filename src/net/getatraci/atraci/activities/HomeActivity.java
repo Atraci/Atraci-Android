@@ -47,7 +47,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	SearchFragment search;
 	PlaylistSelectorFragment playlists;
 	SongListFragment songlist;
-	ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -251,10 +250,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	public ViewPager getPager() {
 		return pager;
-	}
-
-	public ArrayList<Fragment> getFragments() {
-		return fragments;
 	}
 
 	public static DatabaseHelper getDatabase() {

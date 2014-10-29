@@ -1,6 +1,7 @@
 package net.getatraci.atraci.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -118,6 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
 			songs.add(item);
 		} while(c.moveToNext());
+		Collections.reverse(songs);
 		return songs;
 	}
 	
