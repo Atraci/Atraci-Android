@@ -17,9 +17,9 @@ public class RootFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// Inflate the fragment layout
-		return inflater.inflate(R.layout.fragment_homenews,
-				container,
-				false); 
+		View view = inflater.inflate(R.layout.fragment_homenews, container, false);
+		//Show playlists when app loads
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, new PlaylistSelectorFragment(HomeActivity.getDatabase())).addToBackStack("playlists").commit();
+		return view;
 	}
 }

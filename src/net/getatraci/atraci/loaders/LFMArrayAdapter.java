@@ -137,8 +137,8 @@ public class LFMArrayAdapter extends BaseAdapter {
 		} 
 		
 		
-        Animation animationY = new ScaleAnimation(0, 1, 1, 1, Animation.RELATIVE_TO_SELF, 0, Animation.RELATIVE_TO_SELF, 0);
-        animationY.setDuration(700);
+        Animation animationY = new ScaleAnimation(0, 1, 1, 1, Animation.RELATIVE_TO_PARENT, 1, Animation.RELATIVE_TO_PARENT, 1);
+        animationY.setDuration(200);
         convertView.startAnimation(animationY);  
         animationY = null;
 		

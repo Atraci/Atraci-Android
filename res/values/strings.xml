@@ -14,7 +14,7 @@
     <string name="quality_injection">player.getAvailableQualityLevels(player.getAvailableQualityLevels().length - 1)</string>
 
     <string-array name="navigation_items">
-        <item>Home</item>
+<!--         <item>Home</item> -->
         <item>Top 100 Chart</item>
         <item>My Playlists</item>
         <item>History</item>

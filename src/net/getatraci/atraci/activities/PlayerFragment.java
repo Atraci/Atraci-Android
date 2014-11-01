@@ -2,22 +2,23 @@ package net.getatraci.atraci.activities;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import net.getatraci.atraci.R;
+import net.getatraci.atraci.data.AsyncYoutubeGetter;
 import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
 import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
-import net.getatraci.atraci.loaders.PlayerLoader;
 import net.getatraci.atraci.loaders.QueueListAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.LoaderManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,7 +26,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,10 +34,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
@@ -68,16 +67,15 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private NotificationManager mNotifyMgr; // Manager that handles the notification
 	private static final int NOTIFY_ID=1; //ID of the notification
 	private boolean videoOver = true;
-	private PlayerLoader loader;
 	private Timer timer;
 	private boolean playing = false;
 	private boolean shuffle = false;
 	private boolean repeat = false;
 	private boolean isSeeking = false;
-	private LoaderManager manager;
-	private Loader<String[]> mLoader;
 	private QueueListAdapter q_adapter;
 	private Bundle bundle;
+	private boolean HTMLLoaded = false;
+	private int timePlayed = 0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,13 +85,12 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		View view = inflater.inflate(R.layout.fragment_player,
 				container,
 				false); 
-		manager = getLoaderManager();
-		loader = new PlayerLoader(this);
+		//manager = getLoaderManager();
+		//loader = new PlayerLoader(this);
 		mNotifyMgr = (NotificationManager) getActivity().getSystemService(Activity.NOTIFICATION_SERVICE);
 		//wv = (CustomWebView)view.findViewById(R.id.youtube_view);
 		wv = new WebView(getActivity());
 		setUpWebview();
-
 		play_button = (ImageButton)view.findViewById(R.id.playbut);
 		prev_button = (ImageButton)view.findViewById(R.id.prevbut);
 		next_button = (ImageButton)view.findViewById(R.id.nextbut);
@@ -104,6 +101,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		total_time = (TextView)view.findViewById(R.id.total_time);
 		queue_list = (ListView)view.findViewById(R.id.queue_list);
 		wv_frame = (FrameLayout) view.findViewById(R.id.webview_frame);
+		wv.setBackgroundColor(Color.BLACK);
 		wv_frame.addView(wv);
 		//Load button action listeners
 		setPlayButtonOnClick();
@@ -117,9 +115,13 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		if(bundle == null && savedInstanceState == null){ //If nothing has been sent to the player, lets simply load their history
 			query = HomeActivity.getDatabase().getHistory();
 			position = 0;
-			q_adapter = new QueueListAdapter(getActivity(), query, position);
 			queue_list.setOnItemClickListener(this);
-			mLoader = manager.restartLoader(123, bundle, loader);
+			bundle = new Bundle();
+			bundle.putParcelableArrayList("values", query);
+			bundle.putInt("position", position);
+			if(query.size() > 0){
+				loadNewBundle(bundle);
+			}
 			return view;
 		}
 		else if(bundle == null){
@@ -127,10 +129,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		}
 		query = bundle.getParcelableArrayList("values");
 		position = bundle.getInt("position");
-		q_adapter = new QueueListAdapter(getActivity(), query, position);
 		queue_list.setOnItemClickListener(this);
-		//Load the song to being playing
-		mLoader = manager.restartLoader(123, bundle, loader);
 		return view;
 	}
 
@@ -143,7 +142,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		am.registerMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
 		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 	}
-	
+
 	@Override
 	public void onDestroyView() {
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
@@ -151,59 +150,52 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		am.unregisterMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
 		super.onDestroyView();
 	};
-	
-	
-
-	@Override
-	public void onViewStateRestored(Bundle savedInstanceState) {
-		Log.d("ATRACI", "view state restored");
-		super.onViewStateRestored(savedInstanceState);
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putBundle("oldBundle", bundle);
-		if(timer != null){
-			timer.cancel();
-		}
-		super.onSaveInstanceState(outState);
-	}
 
 
-
-	public void setBundle(Bundle bundle) {
-		this.bundle = bundle;
-	}
-
-
-
-	//	@Override
 	public void loadNewBundle(Bundle bundle) {
-		HomeActivity.pager.setCurrentItem(1);
 		this.bundle = bundle;
 		if(bundle != null) {
 			query = bundle.getParcelableArrayList("values");
 			position = bundle.getInt("position");
 			stopVideo();
-			if(manager.getLoader(123) == null){
-				mLoader = manager.restartLoader(123, bundle, loader);
-			} else {
-				manager.getLoader(123).forceLoad();
-			}
+			q_adapter = new QueueListAdapter(getActivity(), query, position);
+			queue_list.setAdapter(q_adapter);
 		}
+		MusicItem song = query.get(position);
+		String ytLink = "";
+		try {
+			ytLink = new AsyncYoutubeGetter(song.getTrack() + " - " + song.getArtist()).get();
+			song.setYoutube(ytLink);
+			wv.loadDataWithBaseURL("http://localhost:8080/", getHtml(ytLink), "text/html", "utf-8", null);
+			HomeActivity.getDatabase().addToHistory(song);
+			setTimePlayed(0);
+			if(!HTMLLoaded){
+				pauseVideo();
+			} else {
+				playVideo();
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
-	
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		startTimer();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
+	public void loadNewVideoAtCurrentPosition(){
+		MusicItem song = query.get(position);
+		q_adapter.setPos(position);
+		q_adapter.notifyDataSetChanged();
+		String ytLink = "";
+		try {
+			ytLink = new AsyncYoutubeGetter(song.getTrack() + " - " + song.getArtist()).get();
+			song.setYoutube(ytLink);
+			HomeActivity.getDatabase().addToHistory(song);
+			wv.loadUrl("javascript:player.loadVideoById(\""+ JSONParser.extractYoutubeId(ytLink)+"\", 0, \"large\");");
+			setTimePlayed(0);
+			playVideo();
+		} catch (InterruptedException | ExecutionException | MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setSeekbarOnChange() {
@@ -319,26 +311,39 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				//Stop the current song from playing
-				stopVideo();
-				if(!shuffle) {
-					position = position + offset;
+				//If video has been playing for a bit
+				//make prev button take track back to 
+				//the beginning on first click
+				if(offset == -1 && timePlayed > 5){ 
+					wv.loadUrl("javascript:player.seekTo(0, true);");
+					timePlayed = 0;
 				} else {
-					position = getRandomIndex();
-				}
 
-				if(position < 0) {
-					position = 0;
-				} else if(repeat && position >= query.size()) {
-					position = 0;
-				} else if(!repeat && position >= query.size()) {
-					return;
+					//Stop the current song from playing
+					stopVideo();
+					if(!shuffle) {
+						position = position + offset;
+					} else {
+						position = getRandomIndex();
+					}
+
+					if(position < 0) {
+						position = 0;
+					} else if(repeat && position >= query.size()) {
+						position = 0;
+					} else if(!repeat && position >= query.size()) {
+						return;
+					}
+					//Get the new song and begin playing
+					loadNewVideoAtCurrentPosition();
+					//playVideo();
 				}
-				//Get the new song and begin playing
-				mLoader.forceLoad();
-				playVideo();
 			}
 		});
+	}
+
+	public void updateQueueListPosition(){
+
 	}
 
 	/**
@@ -399,9 +404,9 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 				reshowLastNotification();
 				startTimer();
 				playing = true;
-		        //Create a notification with the song information
+				//Create a notification with the song information
 				MusicItem current = query.get(position);
-		        showNotification(current.toString(), "Now Playing", current.toString());
+				showNotification(current.toString(), "Now Playing", current.toString());
 			}});
 	}
 
@@ -439,14 +444,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 				//actionBar.setTitle(text);
 			}});
 	}
-
-	/**
-	 * Callback that handles when the user presses the back button.
-	 * We want to stop the video and destroy the activity if the user
-	 * goes back to the song list so we don't end up playing 2 songs
-	 * at once.
-	 */
-
 
 	/**
 	 * Create a notification and display it in the notification drawer that is 
@@ -497,7 +494,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	 */
 	public void reshowLastNotification() {
 		if(notification != null){
-		mNotifyMgr.notify(NOTIFY_ID, notification);
+			mNotifyMgr.notify(NOTIFY_ID, notification);
 		}
 	}
 
@@ -610,8 +607,8 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		websettings.setMediaPlaybackRequiresUserGesture(false);
 
 		//Set the webclients to support HTML5
-		wv.setWebViewClient(new WebViewClient());
-		wv.setWebChromeClient(new WebChromeClient());
+		//wv.setWebViewClient(new WebViewClient());
+		//wv.setWebChromeClient(new WebChromeClient());
 		//Set the javascript interface
 		wv.addJavascriptInterface(new PlayerJSInterface(this), "JSInt");
 		wv.setPadding(0, 0, 0, 0);
@@ -629,8 +626,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		this.position = position;
 		q_adapter.setPos(position);
 		q_adapter.notifyDataSetChanged();
-		manager.getLoader(123).forceLoad();
-
+		loadNewVideoAtCurrentPosition();
 	}
 
 	public FrameLayout getWv_frame() {
@@ -648,9 +644,25 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public void setQueue_list(ListView queue_list) {
 		this.queue_list = queue_list;
 	}
-	
+
 	public boolean isPlaying(){
 		return playing;
+	}
+
+	public boolean isHTMLLoaded() {
+		return HTMLLoaded;
+	}
+
+	public void setHTMLLoaded(boolean hTMLLoaded) {
+		HTMLLoaded = hTMLLoaded;
+	}
+
+	public int getTimePlayed() {
+		return timePlayed;
+	}
+
+	public void setTimePlayed(int timePlayed) {
+		this.timePlayed = timePlayed;
 	}
 
 }

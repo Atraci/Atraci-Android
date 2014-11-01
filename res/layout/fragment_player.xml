@@ -16,14 +16,9 @@
     <FrameLayout
         android:id="@+id/webview_frame"
         android:layout_width="fill_parent"
-        android:layout_height="200dp" >
-
-<!--         <net.getatraci.atraci.interfaces.CustomWebView -->
-<!--             android:id="@+id/youtube_view" -->
-<!--             android:layout_width="fill_parent" -->
-<!--             android:layout_height="fill_parent" -->
-<!--             android:layout_gravity="center_horizontal" -->
-<!--             android:layout_margin="12dip" /> -->
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:color/black" >
     </FrameLayout>
 
     <LinearLayout
@@ -34,23 +29,23 @@
 
         <SeekBar
             android:id="@+id/player_seekbar"
-            android:layout_width="275dp"
+            android:layout_width="250dp"
             android:layout_height="fill_parent" >
         </SeekBar>
 
-        <TextView
-            android:id="@+id/play_time"
-            android:layout_width="35dp"
-            android:layout_height="match_parent"
-            android:gravity="right" >
-        </TextView>
+            <TextView
+                android:id="@+id/play_time"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:gravity="right" >
+            </TextView>
 
-        <TextView
-            android:id="@+id/total_time"
-            android:layout_width="35dp"
-            android:layout_height="match_parent"
-            android:gravity="right" >
-        </TextView>
+            <TextView
+                android:id="@+id/total_time"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:gravity="right" >
+            </TextView>
     </LinearLayout>
 
     <LinearLayout
@@ -120,10 +115,10 @@
             android:text="@string/shuffle" />
     </LinearLayout>
 
-        <ListView
-            android:id="@+id/queue_list"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:text="@string/lyrics"/>
+    <ListView
+        android:id="@+id/queue_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/lyrics" />
 
 </LinearLayout>

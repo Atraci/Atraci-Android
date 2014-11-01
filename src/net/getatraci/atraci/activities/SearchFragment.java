@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Loader;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,10 +44,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	private final long SEARCH_TRIGGER_DELAY_IN_MS = 600;
 	private static final int LID_LFM = 0;
 	private SongListFragment songlist;
-
-	public SearchFragment() {
-
-	}
+	private EditText searchField;
 
 	public SearchFragment(SongListFragment sl) {
 		songlist = sl;
@@ -71,9 +69,6 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	public void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
 		setHasOptionsMenu(true);
-		//setContentView(R.layout.activity_search);
-
-
 	}
 
 	public void launchSongList(Bundle bundle) {
@@ -85,8 +80,8 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		} else {
 			songlist.setBundle(bundle);
 		}
+		hideKeyBoard(searchField.getApplicationWindowToken(), getActivity());
 		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).commit();
-		//songlist.onNewBundle(bundle);
 	}
 
 	@Override
@@ -102,7 +97,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
 
 		searchView.setOnQueryTextListener(this);
-		EditText searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
+		searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
 		searchField.setTextColor(Color.LTGRAY);
 		searchField.setHintTextColor(Color.RED);
 		searchField.setHint(getResources().getString(R.string.seach_hint));
@@ -191,7 +186,6 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	@Override
 	public void onLoadFinished(Loader<LFMArrayAdapter> loader, LFMArrayAdapter adapter) {
 		list.setAdapter(adapter);
-		//progress.dismiss();
 	}
 
 	@Override
@@ -231,13 +225,13 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		bundle.putString("query", text);
 		bundle.putBoolean("isPlaylist", false);
 		launchSongList(bundle);
-		hideKeyBoard(getActivity());
+		hideKeyBoard(searchField.getApplicationWindowToken(), getActivity());
 		return true;
 	}
 	
-	public static void hideKeyBoard(Activity activity){
+	public static void hideKeyBoard(IBinder token, Activity activity){
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),0);
+		imm.hideSoftInputFromWindow(token ,0);
 	}
 	
 	public static void showKeyBoard(Activity activity){

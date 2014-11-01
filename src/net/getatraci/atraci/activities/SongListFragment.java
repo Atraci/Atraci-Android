@@ -184,7 +184,9 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		//bundle.putStringArray("values", songs);
 		bundle.putParcelableArrayList("values", songs);
 		bundle.putInt("position", pos);
+		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).setHTMLLoaded(true);
 		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
+		HomeActivity.pager.setCurrentItem(1);
 	}
 
 	@Override

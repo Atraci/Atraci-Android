@@ -34,19 +34,23 @@ public class PlayerJSInterface {
 	
 	@JavascriptInterface
 	public void onVideoPlaying() {
+		player.playVideo();
 		
 	}
 	
 	@JavascriptInterface
 	public void onPlayerReady() {
-	//	player.playVideo();
 	}
 	
 	@JavascriptInterface
-	public void forceLoad(){
-		if(!player.getWebView().isShown()){
-			player.getLoaderManager().getLoader(123).forceLoad();
-		}
+	public void setHTMLLoaded(){
+		player.setHTMLLoaded(true);
+	}
+	
+	@JavascriptInterface
+	public boolean isHTMLLoaded(){
+		Log.d("ATRACI", Boolean.toString(player.isHTMLLoaded()));
+		return player.isHTMLLoaded();
 	}
 	
 	@JavascriptInterface
@@ -56,7 +60,7 @@ public class PlayerJSInterface {
 		display.getSize(size);
 		//return player.getWv_frame().getWidth();
 		
-		return player.getWebView().getWidth();
+		return player.getWebView().getWidth() - 25;
 	}
 	
 	@JavascriptInterface
@@ -78,6 +82,7 @@ public class PlayerJSInterface {
 	public void setVideoTime(int time) {
 		player.getSeekBar().setProgress(time);
 		player.setTimeViewTime(time);
+		player.setTimePlayed(time);
 	}
 	
 	@JavascriptInterface

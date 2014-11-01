@@ -1,15 +1,13 @@
 package net.getatraci.atraci.activities;
 
-import java.util.ArrayList;
-
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.DatabaseHelper;
 import net.getatraci.atraci.loaders.PagerFragmentAdapter;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -25,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -38,7 +37,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 
 	private String[] mNavigationDrawerItemTitles; 	 //Contains list of items in the Navigation Drawer
 	private DrawerLayout mDrawerLayout;			 	 //Placeholder for navigation drawer
-	private ListView mDrawerList;					 //View that holds the navigation drawer
+	private static ListView mDrawerList;					 //View that holds the navigation drawer
 	private ActionBarDrawerToggle mDrawerToggle;  	 //Toggle on App Icon to open nav drawer
 	private static DatabaseHelper database;
 	public static ViewPager pager;
@@ -53,7 +52,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-
+		getActionBar().setTitle(getResources().getString(R.string.app_name));
 		pager = (ViewPager)findViewById(R.id.content_frame);
 		pager.setOffscreenPageLimit(2);
 		pageAdapter = new PagerFragmentAdapter(this.getFragmentManager());
@@ -75,7 +74,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 				super.onDrawerOpened(drawerView);
 			}
 		};
-
 		// Set the drawer toggle as the DrawerListener
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		// Set the click listener to the callbacks in this Activity
@@ -84,8 +82,9 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		// Allow user to tap the appicon
 		getActionBar().setHomeButtonEnabled(true);
-		//Show the news fragment
 	}
+	
+	
 
 	/* Called after the activity has been created */
 	@Override
@@ -151,6 +150,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		else {
 			if(confirmExit){
 				database.closeDatabaseConnection();
+				((PlayerFragment)pageAdapter.getRegisteredFragment(1)).onDestroy();
 				finish();
 			} else {
 				confirmExit = true;
@@ -182,27 +182,26 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to see the root fragment
 		switch(position) {
-		case 0:		// Home item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();
-			getActionBar().setTitle(getResources().getString(R.string.app_name));
-			break;
-		case 1:		// Top 100 tracks item clicked
+//		case 0:		// Home item clicked
+//			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();
+//			break;
+		case 0:		// Top 100 tracks item clicked
 			launchTop100();
 			break;
-		case 2:		// Playlists items clicked
+		case 1:		// Playlists items clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new PlaylistSelectorFragment(database)).addToBackStack("playlists").commit();
 			break;
-		case 3:		// History item clicked
+		case 2:		// History item clicked
 			launchHistory();
 			break;
-		case 4:		//Now playing item clicked
+		case 3:		//Now playing item clicked
 			pager.setCurrentItem(1);
 			break;	
-		case 5:		//Donate item clicked
+		case 4:		//Donate item clicked
 			launchDonate();
 			break;
 
-		case 6:		//Settings item clicked
+		case 5:		//Settings item clicked
 			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment(this)).addToBackStack(null).commit();
 			break;
 		}
@@ -210,7 +209,6 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 		mDrawerList.setItemChecked(position, true);
 		// Since an item was clicked, we want to move it out of the way and bring focus to user selection
 		mDrawerLayout.closeDrawer(mDrawerList);
-
 	}
 
 	private void launchDonate() {

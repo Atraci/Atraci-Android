@@ -1,5 +1,7 @@
 package net.getatraci.atraci.loaders;
 
+import java.net.MalformedURLException;
+
 import net.getatraci.atraci.activities.HomeActivity;
 import net.getatraci.atraci.activities.PlayerFragment;
 import net.getatraci.atraci.data.MusicItem;
@@ -47,6 +49,9 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 			public String[] loadInBackground() {
 			String[] results = new String[3];
 				try {
+					if(mPlayer.getQuery().size() == 0){
+						return results;
+					}
 					MusicItem item = mPlayer.getQuery().get(mPlayer.getPosition());
 					HomeActivity.getDatabase().addToHistory(item);
 					//Get the ID from the full URL
@@ -102,14 +107,25 @@ public class PlayerLoader implements LoaderCallbacks<String[]> {
 	@SuppressLint("SetJavaScriptEnabled")
 	@Override
 	public void onLoadFinished(Loader<String[]> loader, String[] data) {
-		mPlayer.getQueue_list().setAdapter(new QueueListAdapter(mPlayer.getActivity(), mPlayer.getQuery(), mPlayer.getPosition()));
-		Log.d("ATRACI", "load finished");
+		
+		
 		if(mPlayer.getPosition() > 3){
 		mPlayer.getQueue_list().setSelection(mPlayer.getPosition()-2);
 		}
 		wv = mPlayer.getWebView();
-		//Load the YTHtml.html file into the webview to create YouTube player
-		wv.loadDataWithBaseURL("http://localhost:8000/", mPlayer.getHtml(data[0]), "text/html", "utf-8", null);
+		if(!mPlayer.isHTMLLoaded()){
+			//Load the YTHtml.html file into the webview to create YouTube player
+			wv.loadDataWithBaseURL("http://localhost:8000/", mPlayer.getHtml(data[0]), "text/html", "utf-8", null);
+		}
+		else {
+			try {
+				wv.loadUrl("javascript:player.loadVideoById(\""+JSONParser.extractYoutubeId(data[0])+"\", 0, \"large\");");
+				Log.d("ATRACI", "load by URL");
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
         mPlayer.setVideoOver(false);
         if(mPlayer.isPlaying()){
         	mPlayer.playVideo();
