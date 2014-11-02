@@ -9,6 +9,7 @@
     <string name="title_activity_player">PlayerActivity</string>
     <string name="menuitem_refresh">Refresh</string>
     <string name="lyrics">Fetching lyrics!</string>
+    <string name="genres">Genres</string>
     <string name="drawer_open">Atraci</string>
     <string name="drawer_close">Closed</string>
     <string name="quality_injection">player.getAvailableQualityLevels(player.getAvailableQualityLevels().length - 1)</string>

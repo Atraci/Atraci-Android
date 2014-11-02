@@ -44,7 +44,6 @@ public class PlaylistListAdapter extends BaseAdapter {
         if(v == null)
         {
            v = inflater.inflate(android.R.layout.simple_list_item_1, viewGroup, false);
-           //v.setTag(android.R.id.text1, v.findViewById(android.R.id.text1));
         }
 
         name = (TextView)v.findViewById(android.R.id.text1);

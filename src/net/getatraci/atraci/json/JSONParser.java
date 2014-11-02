@@ -30,7 +30,7 @@ public class JSONParser {
 	public static final String YOUTUBE_API_URL_RTSP = "http://gdata.youtube.com/feeds/api/videos?format=6&alt=json&max-results=1&q=";
 	public static final String YOUTUBE_API_URL = "http://gdata.youtube.com/feeds/api/videos?alt=json&format=5&restriction=US&max-results=1&q=";
 	public static final String LYRICS_WIKIA_API_URL = "http://lyrics.wikia.com/api.php?fmt=realjson&func=getSong&artist=%s&song=%s";
-	public static final String TOP_100_LIST_URL = "http://itunes.apple.com/rss/topsongs/limit=100/explicit=true/json";
+	public static final String TOP_100_LIST_URL = "http://itunes.apple.com/rss/topsongs/limit=100/genre=%@/explicit=true/json";
 	
 	public static final int ATRACI = 0;
 	public static final int LFM = 1;

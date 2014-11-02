@@ -3,11 +3,11 @@ package net.getatraci.atraci.activities;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.DatabaseHelper;
 import net.getatraci.atraci.loaders.PagerFragmentAdapter;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -23,7 +23,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -181,6 +180,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to see the root fragment
+		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		switch(position) {
 //		case 0:		// Home item clicked
 //			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();

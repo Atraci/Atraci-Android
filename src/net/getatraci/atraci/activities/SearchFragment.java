@@ -75,12 +75,9 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		if(songlist == null){
 			songlist = new SongListFragment();
 		}
-		if(songlist.getActivity() == null){
-			songlist.setArguments(bundle);
-		} else {
 			songlist.setBundle(bundle);
-		}
 		hideKeyBoard(searchField.getApplicationWindowToken(), getActivity());
+		
 		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).commit();
 	}
 
