@@ -5,16 +5,63 @@
     <string name="hello_world">Привет, мир!</string>
     <string name="action_settings">Настройки</string>
     <string name="action_search">Поиск</string>
-    <string name="seach_hint">Искать по Названию/Артисту/Альбому</string>
+    <string name="seach_hint">Искать Песню/Исполнителя/Альбом</string>
     <string name="title_activity_player">PlayerActivity</string>
     <string name="menuitem_refresh">Обновить</string>
-    <string name="lyrics">Получаем текст трека!</string>
+    <string name="lyrics">Получение текста!</string>
+    <string name="genres">Жанры</string>
     <string name="drawer_open">Atraci</string>
-    <string name="drawer_close">Закрыт</string>
-    
+    <string name="drawer_close">Закрыто</string>
+    <string name="quality_injection">player.getAvailableQualityLevels(player.getAvailableQualityLevels().length - 1)</string>
+
     <string-array name="navigation_items">
-    <item>Топ треки</item>
-    <item>Топ 100</item>
-    <item>Мой плей-лист</item>
-</string-array>
+<!--         <item>Home</item> -->
+        <item>Чарт Топ-100</item>
+        <item>Мои плей-листы</item>
+        <item>История</item>
+        <item>Играет</item>
+        <item>Пожертвовать</item>
+        <item>Настройки</item>
+    </string-array>
+        <string-array name="quality_names">
+        <item>Низкое</item>
+        <item>Среднее</item>
+        <item>Лучшее</item>
+    </string-array>
+    <string-array name="quality_values">
+        <item>small</item>
+        <item>large</item>
+        <item>@string/quality_injection</item>
+    </string-array>
+
+    <string name="play">Играть</string>
+    <string name="pause">Пауза</string>
+    <string name="backarrow">&lt;&lt;</string>
+    <string name="forwardarrow">&gt;&gt;</string>
+    <string name="title_activity_playlist_selector">PlaylistSelectorActivity</string>
+    <string name="playlists">Мои плей-листы</string>
+    <string name="top100">Чарт Топ-100</string>
+    <string name="add_playlist">Добавить плей-лист</string>
+    <string name="playlist_hint">Введите название плей-листа</string>
+    <string name="shuffle">Случайный порядок</string>
+    <string name="repeat">Повторять песню</string>
+    <string name="playlist_exists">"Плей-лист с таким название уже существует. Выберите новое название"</string>
+    <string name="no_playlists_found">Плей-листы не найдены!</string>
+    <string name="no_songs">Здесь нет песен!</string>
+    <string name="add_to_playlist">Добавить в плей-лист:</string>
+    <string name="exists_in_playlist">Выбранная песня уже </string>
+    <string name="unexpected_error">Произошла непредвиденная ошибка!</string>
+    <string name="song_delete_successful">Песня успешно удалена!</string>
+    <string name="song_added_to">Песня добавлена в </string>
+    <string name="playlist">Плей-лист</string>
+    <string name="has_been_deleted">был удалён!</string>
+    <string name="loading">Загрузка</string>
+    <string name="update_feed">Обновить фид</string>
+    <string name="pk_quality">use_low_quality</string>
+    <string name="use_low_quality">Загружать видео с более низким качеством</string>
+    <string name="quality_desc">Уменьшает потребление трафика благодаря более низкому качеству видео.</string>
+    <string name="clear_history">Очистить всю историю</string>
+    <string name="clear_history_desc">Удаляет список прослушанных песен.</string>
+    <string name="history_cleared">История прослушивания удалена!</string>
+
 </resources>
