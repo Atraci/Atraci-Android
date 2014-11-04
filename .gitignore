@@ -26,7 +26,6 @@ proguard/
 .classpath
 .project
 .settings/
-build.xml
 
 # Log Files
 *.log
