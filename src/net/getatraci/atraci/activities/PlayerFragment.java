@@ -581,7 +581,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				getTotalTimeView().setText(String.format("/ %d:%02d", (time/60), time % 60 ));
+				getTotalTimeView().setText(String.format("%d:%02d", (time/60), time % 60 ));
 			}});
 	}
 
