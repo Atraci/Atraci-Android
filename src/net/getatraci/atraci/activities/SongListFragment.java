@@ -128,7 +128,6 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 			@Override
 			public SongListAdapter loadInBackground() {
 				try {
-					Log.d("ATRACI", bundle.getString("query"));
 					SongListFragment.this.query = bundle.getString("query");
 					if(QUERY_TOP100.equals(SongListFragment.this.query)) {
 						String json = JSONParser.getJSON(JSONParser.TOP_100_LIST_URL.replaceAll("%@", genre));
@@ -193,6 +192,11 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 
 	@Override
 	public void onLoadFinished(Loader<SongListAdapter> loader, SongListAdapter adapter) {
+		if(QUERY_TOP100.equals(bundle.getString("query"))){
+			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		} else {
+			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		}
 		m_gridview.setAdapter(adapter);
 		getActivity().setProgressBarIndeterminateVisibility(false); 
 		if(adapter == null || adapter.getCount() == 0) {
@@ -226,12 +230,6 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		GridView grid = (GridView)adapter.findViewById(R.id.gridview);
-
-		//		ArrayList<MusicItem> songs = new ArrayList<MusicItem>();
-		//		for(int i = 0; i < grid.getAdapter().getCount(); i++) {
-		//			MusicItem mi = ((MusicItem)grid.getAdapter().getItem(i));
-		//			songs.add(mi);
-		//		}
 		HomeActivity.getDatabase().addToHistory((MusicItem)grid.getAdapter().getItem(position));
 		startPlayerActivity(results, position);	
 	}
@@ -329,19 +327,16 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	}
 
 	@Override
-	public void onLoaderReset(Loader<SongListAdapter> loader) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		if(QUERY_TOP100.equals(query)){
-			Log.d("ATRACI", "item clicked in navbar");
 			genre = (String)genreAdapter.getItem(itemPosition);
 			getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
 		}
 		return true;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<SongListAdapter> loader) {
 	}
 
 

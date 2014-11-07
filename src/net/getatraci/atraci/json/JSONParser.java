@@ -27,7 +27,6 @@ public class JSONParser {
 
 	public static final String  LASTFM_API_URL = "http://www.last.fm/search/autocomplete?q=";
 	public static final String ATRACI_API_URL = "http://api.getatraci.net/search/";
-	public static final String YOUTUBE_API_URL_RTSP = "http://gdata.youtube.com/feeds/api/videos?format=6&alt=json&max-results=1&q=";
 	public static final String YOUTUBE_API_URL = "http://gdata.youtube.com/feeds/api/videos?alt=json&format=5&restriction=US&max-results=1&q=";
 	public static final String LYRICS_WIKIA_API_URL = "http://lyrics.wikia.com/api.php?fmt=realjson&func=getSong&artist=%s&song=%s";
 	public static final String TOP_100_LIST_URL = "http://itunes.apple.com/rss/topsongs/limit=100/genre=%@/explicit=true/json";
@@ -232,21 +231,6 @@ public class JSONParser {
         	lfi.setImage_med(jo.getString(currentKey));
         	return;
         }
-    }
-    
-    public static String parseYoutubeRTSP(String q) throws JSONException {
-    	try {
-    		q = q.replaceAll(" ", "%20");
-			String json = getJSON(YOUTUBE_API_URL_RTSP+q);
-			JSONObject ja = new JSONObject(json).getJSONObject("feed").getJSONArray("entry").getJSONObject(0).getJSONObject("media$group");
-
-			String link = ja.getJSONArray("media$content").getJSONObject(2).getString("url");
-			return link;
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			Log.e("ATRACI", e.getMessage(), e);
-		}
-    	return null;
     }
     
     public static String parseYoutube(String q) throws JSONException {
