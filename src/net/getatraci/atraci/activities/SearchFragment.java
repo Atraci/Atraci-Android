@@ -83,24 +83,23 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getActivity().getMenuInflater().inflate(R.menu.searchview, menu);
+		// Create a SearchView widget from search icon
 		menu.findItem(R.id.action_search).setActionView(new android.widget.SearchView(getActivity()));
+
 		SearchManager searchManager =
 				(SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView =
 				(SearchView) menu.findItem(R.id.action_search).getActionView();
 		searchView.setSearchableInfo(
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
-
+		searchView.setIconifiedByDefault(false);
 		searchView.setOnQueryTextListener(this);
 		searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
-		searchField.setTextColor(Color.LTGRAY);
-		searchField.setHintTextColor(Color.RED);
+		searchField.setTextColor(Color.WHITE);
+		searchField.setHintTextColor(Color.LTGRAY);
 		searchField.setHint(getResources().getString(R.string.seach_hint));
 		searchField.setFocusable(true);
 		searchField.requestFocus();
-		searchView.setIconifiedByDefault(false);
 		showKeyBoard(getActivity());
 		super.onCreateOptionsMenu(menu, inflater);
 	}
