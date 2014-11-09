@@ -94,9 +94,12 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
 		searchView.setIconifiedByDefault(false);
 		searchView.setOnQueryTextListener(this);
+
+		View searchPlate = searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null));
+		searchPlate.setBackgroundResource(R.drawable.textfield_searchview);
 		searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
 		searchField.setTextColor(Color.WHITE);
-		searchField.setHintTextColor(Color.LTGRAY);
+		searchField.setHintTextColor(Color.GRAY);
 		searchField.setHint(getResources().getString(R.string.seach_hint));
 		searchField.setFocusable(true);
 		searchField.requestFocus();
