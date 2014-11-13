@@ -83,16 +83,17 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// Create a SearchView widget from search icon
-		menu.findItem(R.id.action_search).setActionView(new android.widget.SearchView(getActivity()));
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getActivity().getMenuInflater().inflate(R.menu.searchview, menu);
+		menu.removeItem(R.id.action_search);
 
 		SearchManager searchManager =
 				(SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView =
-				(SearchView) menu.findItem(R.id.action_search).getActionView();
+				(SearchView) menu.findItem(R.id.action_searchview).getActionView();
 		searchView.setSearchableInfo(
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
-		searchView.setIconifiedByDefault(false);
+		searchView.setIconified(false);
 		searchView.setOnQueryTextListener(this);
 
 		View searchPlate = searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null));
