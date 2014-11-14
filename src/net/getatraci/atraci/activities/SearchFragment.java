@@ -35,9 +35,10 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 
-public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener {
+public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener, OnCloseListener {
 
 	private ListView list;
 	private Timer timer = new Timer();
@@ -85,22 +86,26 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getActivity().getMenuInflater().inflate(R.menu.searchview, menu);
-		menu.findItem(R.id.action_search).setActionView(new android.widget.SearchView(getActivity()));
+		menu.removeItem(R.id.action_search);
+
 		SearchManager searchManager =
 				(SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
 		SearchView searchView =
-				(SearchView) menu.findItem(R.id.action_search).getActionView();
+				(SearchView) menu.findItem(R.id.action_searchview).getActionView();
 		searchView.setSearchableInfo(
 				searchManager.getSearchableInfo(getActivity().getComponentName()));
-
+		searchView.setIconified(false);
 		searchView.setOnQueryTextListener(this);
+		searchView.setOnCloseListener(this);
+
+		View searchPlate = searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null));
+		searchPlate.setBackgroundResource(R.drawable.textfield_searchview);
 		searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
-		searchField.setTextColor(Color.LTGRAY);
-		searchField.setHintTextColor(Color.RED);
+		searchField.setTextColor(Color.WHITE);
+		searchField.setHintTextColor(Color.GRAY);
 		searchField.setHint(getResources().getString(R.string.seach_hint));
 		searchField.setFocusable(true);
 		searchField.requestFocus();
-		searchView.setIconifiedByDefault(false);
 		showKeyBoard(getActivity());
 		super.onCreateOptionsMenu(menu, inflater);
 	}
@@ -156,7 +161,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 
 			@Override
 			protected void onStartLoading() {
-				if(data !=null) {
+				if(data != null) {
 					deliverResult(data);
 				}
 				if(data == null){
@@ -223,6 +228,15 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		bundle.putBoolean("isPlaylist", false);
 		launchSongList(bundle);
 		hideKeyBoard(searchField.getApplicationWindowToken(), getActivity());
+		return true;
+	}
+
+	@Override
+	public boolean onClose() {
+		if (SearchFragment.this.isVisible()) {
+			hideKeyBoard(searchField.getApplicationWindowToken(), getActivity());
+			getFragmentManager().popBackStackImmediate();
+		}
 		return true;
 	}
 	

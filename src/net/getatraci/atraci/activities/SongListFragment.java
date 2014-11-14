@@ -103,7 +103,6 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		} else {
 			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		}
-		inflater.inflate(R.menu.postsearch, menu);
 		genreAdapter = new GenreAdapter(getActivity());
 		getActivity().getActionBar().setListNavigationCallbacks(genreAdapter, this);
 		//super.onCreateOptionsMenu(menu, inflater);
