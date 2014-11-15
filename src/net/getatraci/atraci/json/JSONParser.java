@@ -27,7 +27,7 @@ public class JSONParser {
 
 	public static final String  LASTFM_API_URL = "http://www.last.fm/search/autocomplete?q=";
 	public static final String ATRACI_API_URL = "http://api.getatraci.net/search/";
-	public static final String YOUTUBE_API_URL = "http://gdata.youtube.com/feeds/api/videos?alt=json&format=5&restriction=US&max-results=1&q=";
+	public static final String YOUTUBE_API_URL = "http://gdata.youtube.com/feeds/api/videos?alt=json&format=5&max-results=1&q=";
 	public static final String LYRICS_WIKIA_API_URL = "http://lyrics.wikia.com/api.php?fmt=realjson&func=getSong&artist=%s&song=%s";
 	public static final String TOP_100_LIST_URL = "http://itunes.apple.com/rss/topsongs/limit=100/genre=%@/explicit=true/json";
 	
