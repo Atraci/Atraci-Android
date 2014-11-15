@@ -14,7 +14,7 @@
             android:contentDescription="@+string/album_thumbnail"
             android:layout_height="32dp"
             android:layout_gravity="left"
-            android:background="#000000" />
+            android:src="@drawable/song_cover" />
 
         <TextView
             android:id="@+id/item1"

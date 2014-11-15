@@ -18,8 +18,13 @@ public class RootFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_homenews, container, false);
-		//Show playlists when app loads
-		getFragmentManager().beginTransaction().replace(R.id.root_frame, new PlaylistSelectorFragment(HomeActivity.getDatabase())).addToBackStack("playlists").commit();
+		//Show Top100 when app loads
+		Bundle bundle = new Bundle();
+		bundle.putString("query", SongListFragment.QUERY_TOP100);
+		bundle.putBoolean("isPlaylist", false);
+		SongListFragment songlist = new SongListFragment();
+		songlist.setArguments(bundle);
+		getFragmentManager().beginTransaction().replace(R.id.root_frame, songlist).addToBackStack(null).commit();
 		return view;
 	}
 }

@@ -18,11 +18,13 @@ public class SongListAdapter extends BaseAdapter {
 
 	private LayoutInflater inflater;
 	private ArrayList<MusicItem> items;
-
+	private ImageDownloader[] images;
 	int cnt;
+
 	public SongListAdapter(Context c, ArrayList<MusicItem> arr) {
 		inflater = LayoutInflater.from(c);
 		this.items = arr;
+		images = new ImageDownloader[items.size()];
 	}
 
 	public int getCount() {
@@ -36,8 +38,6 @@ public class SongListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return 0;
 	}
-
-
 
 	// create a new ImageView for each item referenced by the Adapter
 	public View getView(int position, View view, ViewGroup viewGroup)
@@ -55,13 +55,17 @@ public class SongListAdapter extends BaseAdapter {
 
 		picture = (ImageView)v.getTag(R.id.picture);
 		name = (TextView)v.getTag(R.id.text);
+		picture.setImageResource(R.drawable.record);
 
-
-
-		new ImageDownloader(picture, items.get(position).getImage_lrg());
+		if(images[position] != null && position != 0){
+			images[position].cancel(true);
+			picture.setImageBitmap(images[position].getImage());
+		} else {
+			images[position] = new ImageDownloader(picture, items.get(position).getImage_lrg());
+		}
 		name.setText(items.get(position).getTrack()+"\n"+items.get(position).getArtist());
 
-		
+
 		doAnimation(v);
 		return v;
 	}
@@ -73,6 +77,14 @@ public class SongListAdapter extends BaseAdapter {
 		animation.setFillEnabled(true);
 		animation.setFillAfter(true);
 		view.startAnimation(animation); 
+	}
+
+	public void cancelAllImageLoads(){
+		for(ImageDownloader i : images){
+			if(i != null){
+				i.cancel(true);
+			}
+		}
 	}
 
 }

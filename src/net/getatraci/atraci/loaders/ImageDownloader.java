@@ -11,6 +11,8 @@ import android.widget.ImageView;
 public class ImageDownloader extends AsyncTask<String, Void, Bitmap>{
 
 	private ImageView iv;
+	private Bitmap bmp;
+	
 	public ImageDownloader(ImageView view, String url) {
 		iv = view;
 		execute(url);
@@ -33,6 +35,11 @@ public class ImageDownloader extends AsyncTask<String, Void, Bitmap>{
 	@Override
 	protected void onPostExecute(Bitmap result) {
 		iv.setImageBitmap(result);
+		bmp = result;
+	}
+	
+	public Bitmap getImage(){
+		return bmp;
 	}
 
 }
