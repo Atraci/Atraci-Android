@@ -109,9 +109,12 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	}
 
 	public void setBundle(Bundle bundle){
+		if(!isAdded()){
+			getFragmentManager().beginTransaction().replace(R.id.root_frame, this).commit();
+		}
 		if(QUERY_TOP100.equals(query)){
 			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		} else {
+		} else if(getActivity() != null) {
 			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		}
 		this.bundle = bundle;

@@ -43,7 +43,7 @@ public class HomeActivity extends Activity implements OnItemClickListener{
 	static PagerFragmentAdapter pageAdapter;
 	SearchFragment search;
 	PlaylistSelectorFragment playlists;
-	SongListFragment songlist;
+	public static SongListFragment songlist;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
