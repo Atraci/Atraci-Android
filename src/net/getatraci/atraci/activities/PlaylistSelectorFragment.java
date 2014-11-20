@@ -15,6 +15,7 @@ import android.content.AsyncTaskLoader;
 import android.content.DialogInterface;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,7 +43,7 @@ import android.widget.Toast;
  *
  */
 
-public class PlaylistSelectorFragment extends Fragment implements OnKeyListener, OnClickListener, OnItemClickListener, OnItemLongClickListener, OnFocusChangeListener, LoaderCallbacks<PlaylistListAdapter> {
+public class PlaylistSelectorFragment extends Fragment implements OnKeyListener, OnClickListener, OnItemClickListener, OnItemLongClickListener, /*OnFocusChangeListener,*/ LoaderCallbacks<PlaylistListAdapter> {
 
 	private Menu mMenu;
 	private DatabaseHelper database;
@@ -101,7 +102,7 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 		getActivity().getActionBar().setTitle("");
 		mMenu.findItem(R.id.action_add).setActionView(R.layout.actionbar_edittext);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_button).setOnClickListener(this);
-		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnFocusChangeListener(this);
+		//mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnFocusChangeListener(this);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnKeyListener(this);
 		getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 	}
@@ -121,14 +122,18 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 		}
 	}
 
-	@Override
-	public void onFocusChange(View v, boolean hasFocus) {
-		if(!hasFocus) {
-			mMenu.findItem(R.id.action_add).setActionView(null);
-			//getActivity().getActionBar().setTitle(getResources().getString(R.string.playlists));
-			getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-		}		
-	}
+//	@Override
+//	public void onFocusChange(View v, boolean hasFocus) {
+//		if(!hasFocus) {
+//			if(mMenu == null)
+//				Log.d("ATRACI", "menu null");
+//			if(mMenu.findItem(R.id.action_add) == null)
+//				Log.d("ATRACI", "action add null");
+//			mMenu.findItem(R.id.action_add).setActionView(null);
+//			//getActivity().getActionBar().setTitle(getResources().getString(R.string.playlists));
+//			getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+//		}		
+//	}
 
 	public Loader<PlaylistListAdapter> onCreateLoader(int id, Bundle bundle) {
 		return new AsyncTaskLoader<PlaylistListAdapter>(getActivity()){
