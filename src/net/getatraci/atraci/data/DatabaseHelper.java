@@ -89,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void addToHistory(MusicItem item){
-		if(item.getYoutube().length() < 1){ //If the youtube URL is missing, do not add to history.
+		if(null == item.getYoutube() && item.getYoutube().length() < 1){ //If the youtube URL is missing, do not add to history.
 			return;
 		}
 		
