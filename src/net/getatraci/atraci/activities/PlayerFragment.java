@@ -142,6 +142,14 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		am.registerMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
 		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 	}
+	
+	
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState = this.bundle;
+		super.onSaveInstanceState(outState);
+	}
 
 	@Override
 	public void onDestroyView() {
@@ -188,14 +196,25 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		String ytLink = "";
 		try {
 			ytLink = new AsyncYoutubeGetter(song.getTrack() + " - " + song.getArtist()).get();
-			song.setYoutube(ytLink);
-			HomeActivity.getDatabase().addToHistory(song);
-			wv.loadUrl("javascript:player.loadVideoById(\""+ JSONParser.extractYoutubeId(ytLink)+"\", 0, \"large\");");
-			setTimePlayed(0);
-			playVideo();
+			if(null != ytLink){
+				song.setYoutube(ytLink);
+				Log.d("ATRACI", ytLink);
+				HomeActivity.getDatabase().addToHistory(song);
+				wv.loadUrl("javascript:player.loadVideoById(\""+ JSONParser.extractYoutubeId(ytLink)+"\", 0, \"large\");");
+				setTimePlayed(0);
+				playVideo();
+			} else {
+				skipToItemByIndexOffset(1); //If youtube URL is missing or malformed, load the next song if available
+			}
 		} catch (InterruptedException | ExecutionException | MalformedURLException e) {
 			e.printStackTrace();
 		}
+		if(position + 3 < query.size()-1){
+			queue_list.smoothScrollToPosition(position + 3);
+		} else {
+			queue_list.smoothScrollToPosition(position);
+		}
+		
 	}
 
 	public void setSeekbarOnChange() {

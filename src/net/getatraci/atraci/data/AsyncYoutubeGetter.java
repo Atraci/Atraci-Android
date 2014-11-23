@@ -17,7 +17,6 @@ public class AsyncYoutubeGetter extends AsyncTask<String, Void, String> {
 		try {
 			return JSONParser.parseYoutube(song);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

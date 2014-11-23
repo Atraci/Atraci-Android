@@ -63,8 +63,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/repeat"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:src="@drawable/ic_action_repeat_off"
             android:text="@string/repeat" />
 
@@ -75,8 +73,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/backarrow"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:src="@drawable/ic_action_previous"
             android:text="@string/backarrow" />
 
@@ -87,8 +83,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/pause"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:src="@drawable/ic_action_play"
             android:text="@string/pause" />
 
@@ -99,8 +93,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/forwardarrow"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:src="@drawable/ic_action_next"
             android:text="@string/forwardarrow" />
 
@@ -111,8 +103,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/shuffle"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:src="@drawable/ic_action_shuffle_off"
             android:text="@string/shuffle" />
     </LinearLayout>

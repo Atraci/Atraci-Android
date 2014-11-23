@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -55,9 +57,17 @@ public class QueueListAdapter extends BaseAdapter{
         name.setText(queue.get(position).getTrack());
         
         if(pos == position){
-        	v.setBackgroundColor(Color.GRAY);
+        	v.setBackgroundColor(Color.BLACK);
+        	name.setTextColor(Color.RED);
+        	ScaleAnimation anim = new ScaleAnimation(0, 1, 1, 1, Animation.RELATIVE_TO_SELF, Animation.RELATIVE_TO_SELF);
+    		anim.setDuration(800);
+    		anim.setFillEnabled(true);
+    		anim.setFillAfter(true);
+        	v.setAnimation(anim);
+        	anim.start();
         } else {
         	v.setBackgroundColor(Color.WHITE);
+        	name.setTextColor(Color.BLACK);
         }
         return v;
 	}

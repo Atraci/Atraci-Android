@@ -89,6 +89,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 	
 	public void addToHistory(MusicItem item){
+		if(item.getYoutube().length() < 1){ //If the youtube URL is missing, do not add to history.
+			return;
+		}
+		
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(HISTORY_ARTIST, item.getArtist());
