@@ -18,7 +18,6 @@ import net.getatraci.atraci.json.JSONParser;
 import net.getatraci.atraci.loaders.QueueListAdapter;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,6 +28,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -156,10 +156,11 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Stop listening for button presses
 		am.unregisterMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
+		pauseVideo();
+		wv.destroy();
 		super.onDestroyView();
 	};
-
-
+	
 	public void loadNewBundle(Bundle bundle) {
 		this.bundle = bundle;
 		if(bundle != null) {

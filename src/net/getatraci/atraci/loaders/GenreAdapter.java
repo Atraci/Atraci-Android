@@ -45,7 +45,8 @@ public class GenreAdapter extends BaseAdapter {
         }
         
         CheckedTextView ctv = (CheckedTextView) v.findViewById(android.R.id.text1);
-        ctv.setTextColor(Color.WHITE);
+        ctv.setTextColor(Color.BLACK);
+        v.setBackgroundColor(Color.RED);
         ctv.setText(Top100Genres.getGenreNameById((String)getItem(position)));
         
         return v;

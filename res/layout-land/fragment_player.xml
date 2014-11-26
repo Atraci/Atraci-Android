@@ -15,7 +15,7 @@
     <FrameLayout
         android:id="@+id/webview_frame"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="fill_parent"
         android:layout_gravity="center_horizontal"
         android:background="@android:color/black" >
     </FrameLayout>
@@ -24,7 +24,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:visibility="invisible" >
 
         <TextView
             android:id="@+id/play_time"
@@ -36,7 +37,7 @@
 
         <SeekBar
             android:id="@+id/player_seekbar"
-            android:layout_width="275dp"
+            android:layout_width="250dp"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal" >
         </SeekBar>
@@ -55,12 +56,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_red_light"
-        android:gravity="center_horizontal" >
+        android:visibility="invisible" >
 
         <ImageButton
             android:id="@+id/repeatbut"
             style="?android:attr/buttonStyle"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/repeat"
@@ -100,7 +101,7 @@
         <ImageButton
             android:id="@+id/shufflebut"
             style="?android:attr/buttonStyle"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@string/shuffle"
@@ -112,6 +113,7 @@
         android:id="@+id/queue_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="@string/lyrics" />
+        android:text="@string/lyrics"
+        android:visibility="invisible" />
 
 </LinearLayout>

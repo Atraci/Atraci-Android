@@ -4,10 +4,10 @@
     tools:context="net.getatraci.atraci.PlaylistSelectorActivity" >
 
     <item
-        android:id="@+id/action_add"
-        android:icon="@drawable/ic_action_add_to_queue"
-        android:orderInCategory="1"
+        android:id="@+id/genre_spinner"
         context:showAsAction="always"
-        android:title="@string/add_playlist"/>
+        android:title="@string/genres"
+        android:orderInCategory="1"
+        android:actionViewClass="android.widget.SearchView"/>
 
 </menu>

@@ -1,11 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:context="http://schemas.android.com/apk/res-auto"
     tools:context="net.getatraci.atraci.HomeActivity" >
     
         <item android:id="@+id/action_searchview"
           android:icon="@drawable/ic_action_search"
           android:title="@string/action_search"
-          android:showAsAction="always"
+          context:showAsAction="always"
           android:actionViewClass="android.widget.SearchView" />
+        
+        <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_action_search"
+        android:orderInCategory="1"
+        context:showAsAction="always"
+        android:title="@string/action_search"/>
 
 </menu>

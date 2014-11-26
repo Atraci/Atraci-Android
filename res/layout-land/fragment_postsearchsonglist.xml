@@ -11,6 +11,15 @@
         android:horizontalSpacing="0dp"
         android:numColumns="5"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="0dp" />
+        android:verticalSpacing="0dp"
+        android:scrollbarSize="50dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible"/>
 
 </FrameLayout>

@@ -9,13 +9,12 @@ import net.getatraci.atraci.loaders.PlaylistListAdapter;
 import net.getatraci.atraci.loaders.SongListAdapter;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.AsyncTaskLoader;
 import android.content.DialogInterface;
-import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,8 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
@@ -35,6 +32,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 /**
@@ -43,7 +41,7 @@ import android.widget.Toast;
  *
  */
 
-public class PlaylistSelectorFragment extends Fragment implements OnKeyListener, OnClickListener, OnItemClickListener, OnItemLongClickListener, /*OnFocusChangeListener,*/ LoaderCallbacks<PlaylistListAdapter> {
+public class PlaylistSelectorFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, /*OnFocusChangeListener,*/ LoaderCallbacks<PlaylistListAdapter>, OnEditorActionListener {
 
 	private Menu mMenu;
 	private DatabaseHelper database;
@@ -67,7 +65,6 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 		getLoaderManager().initLoader(111, null, this);
-		//list.setOnItemClickListener(this);
 	}
 
 	@Override
@@ -99,11 +96,10 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 	}
 
 	public void openTextField() {
-		getActivity().getActionBar().setTitle("");
 		mMenu.findItem(R.id.action_add).setActionView(R.layout.actionbar_edittext);
 		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_button).setOnClickListener(this);
-		//mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnFocusChangeListener(this);
-		mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field).setOnKeyListener(this);
+		((EditText)mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field)).setOnEditorActionListener(this);
+		((EditText)mMenu.findItem(R.id.action_add).getActionView().findViewById(R.id.addplaylist_field)).setImeActionLabel(getActivity().getResources().getString(R.string.add), KeyEvent.KEYCODE_ENTER);
 		getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 	}
 
@@ -121,19 +117,6 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 			Toast.makeText(getActivity(), getString(R.string.playlist_exists), Toast.LENGTH_LONG).show();
 		}
 	}
-
-//	@Override
-//	public void onFocusChange(View v, boolean hasFocus) {
-//		if(!hasFocus) {
-//			if(mMenu == null)
-//				Log.d("ATRACI", "menu null");
-//			if(mMenu.findItem(R.id.action_add) == null)
-//				Log.d("ATRACI", "action add null");
-//			mMenu.findItem(R.id.action_add).setActionView(null);
-//			//getActivity().getActionBar().setTitle(getResources().getString(R.string.playlists));
-//			getActivity().getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-//		}		
-//	}
 
 	public Loader<PlaylistListAdapter> onCreateLoader(int id, Bundle bundle) {
 		return new AsyncTaskLoader<PlaylistListAdapter>(getActivity()){
@@ -213,17 +196,6 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 		Toast.makeText(getActivity(), getString(R.string.loading)+ " " + plist.getName(), Toast.LENGTH_LONG).show();
 		SongListFragment.show(this, Integer.toString(plist.getId()), true);
 	}
-
-	@Override
-	public boolean onKey(View v, int keyCode, KeyEvent event) {
-		if(event.getAction()==KeyEvent.ACTION_UP && keyCode==KeyEvent.KEYCODE_ENTER){
-			onClick(null);
-			return true;
-
-		}else {
-			return false;
-		}
-	}
 	
 	public Dialog createDeleteDialog(final Playlists p, final View view) {
 		final Loader<SongListAdapter> loader = getLoaderManager().getLoader(111);
@@ -248,5 +220,11 @@ public class PlaylistSelectorFragment extends Fragment implements OnKeyListener,
 	            
 	      } });
 	    return builder.create();
+	}
+
+	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		onClick(null);
+		return true;
 	}
 }

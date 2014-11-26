@@ -14,16 +14,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.AsyncTaskLoader;
 import android.content.DialogInterface;
-import android.content.Loader;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,8 +36,13 @@ import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.GridView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
+
+
 
 /**
  * This activity displays a list of songs that the user searched for in the
@@ -46,7 +52,7 @@ import android.widget.Toast;
  *
  */
 
-public class SongListFragment extends Fragment implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener, ActionBar.OnNavigationListener {
+public class SongListFragment extends Fragment implements LoaderCallbacks<SongListAdapter>, OnItemClickListener, OnItemLongClickListener, OnItemSelectedListener {
 
 	GridView m_gridview;
 	private static final int LID_PSSLA = 1;
@@ -59,6 +65,9 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	private Bundle bundle;
 	private GenreAdapter genreAdapter;
 	private String query;
+	private ProgressBar mProgress;
+	private ActionBar mActionBar;
+	private Spinner mGenreSpinner;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,20 +76,19 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		View view = inflater.inflate(R.layout.fragment_postsearchsonglist,
 				container,
 				false); 
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
-
+		mActionBar = ((HomeActivity)getActivity()).getSupportActionBar();
+		mActionBar.setDisplayHomeAsUpEnabled(true);
 		bundle = getArguments();
 		if(bundle == null){
 			return view;
 		}
 		isPlaylist = bundle.getBoolean("isPlaylist");
-
 		m_gridview = (GridView) view.findViewById(R.id.gridview);
-		getLoaderManager().initLoader(LID_PSSLA, bundle, this);
+		mProgress = (ProgressBar) view.findViewById(R.id.progressBar1);
+		mProgress.setBackgroundColor(Color.BLACK);
+		getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
 		m_gridview.setOnItemClickListener(this);
 		m_gridview.setOnItemLongClickListener(this);
-
 		if(isPlaylist) {
 			playlistID = Integer.parseInt(bundle.getString("query"));
 		}
@@ -91,32 +99,31 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	public void onCreate(Bundle savedInstance) {
 		setHasOptionsMenu(true);
 		super.onCreate(savedInstance);
-		getActivity().setProgressBarIndeterminateVisibility(true); 
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		Log.d("ATRACI", "createOptions");
-		getActivity().getActionBar().setDisplayShowTitleEnabled(false);
-		if(QUERY_TOP100.equals(bundle.getString("query"))){
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		} else {
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		}
+		inflater.inflate(R.menu.songlist, menu);
+		mGenreSpinner = new Spinner(getActivity()); 
+		menu.findItem(R.id.genre_spinner).setActionView(mGenreSpinner);
 		genreAdapter = new GenreAdapter(getActivity());
-		getActivity().getActionBar().setListNavigationCallbacks(genreAdapter, this);
+		mGenreSpinner.setAdapter(genreAdapter);
+		mGenreSpinner.setOnItemSelectedListener(this);
 		//super.onCreateOptionsMenu(menu, inflater);
+	}
+	
+
+
+	@Override
+	public void setArguments(Bundle args) {
+		super.setArguments(args);
 	}
 
 	public void setBundle(Bundle bundle){
 		if(!isAdded()){
 			getFragmentManager().beginTransaction().replace(R.id.root_frame, this).commit();
 		}
-		if(QUERY_TOP100.equals(query)){
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		} else if(getActivity() != null) {
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		}
+		Log.d("ATRACI", "new bundle");
 		this.bundle = bundle;
 		getLoaderManager().restartLoader(LID_PSSLA, this.bundle, this);
 	}
@@ -170,7 +177,8 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 					deliverResult(data);
 				}
 				if(data == null){
-					getActivity().setProgressBarIndeterminateVisibility(true); 
+//					getActivity().setProgressBarIndeterminateVisibility(true); 
+					mProgress.setVisibility(View.VISIBLE);
 					forceLoad();
 				}
 			}
@@ -192,15 +200,17 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	}
 
 
+	
 	@Override
 	public void onLoadFinished(Loader<SongListAdapter> loader, SongListAdapter adapter) {
-		if(QUERY_TOP100.equals(bundle.getString("query"))){
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		} else {
-			getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		}
 		m_gridview.setAdapter(adapter);
-		getActivity().setProgressBarIndeterminateVisibility(false); 
+		mProgress.setVisibility(View.INVISIBLE);
+		if(QUERY_TOP100.equals(SongListFragment.this.query)) {
+			mGenreSpinner.setVisibility(View.VISIBLE);
+		} else {
+			mGenreSpinner.setVisibility(View.INVISIBLE);
+		}
+		
 		if(adapter == null || adapter.getCount() == 0) {
 			Toast.makeText(getActivity(), getString(R.string.no_songs), Toast.LENGTH_LONG).show();
 		}
@@ -216,7 +226,6 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		ft.replace(R.id.root_frame, sla);
 		ft.addToBackStack(null);
 		ft.commit();
-
 	}
 
 	private void startPlayerActivity(ArrayList<MusicItem> songs, int pos) {
@@ -330,17 +339,24 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-		if(QUERY_TOP100.equals(query)){
-			genre = (String)genreAdapter.getItem(itemPosition);
-			getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
-		}
-		return true;
+	public void onLoaderReset(Loader<SongListAdapter> loader) {
 	}
 
 	@Override
-	public void onLoaderReset(Loader<SongListAdapter> loader) {
+	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
+			long arg3) {
+		if(QUERY_TOP100.equals(query)){
+			genre = (String)genreAdapter.getItem(pos);
+			getLoaderManager().restartLoader(LID_PSSLA, bundle, this);
+		}
+		
 	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// Do nothing.
+	}
+
 
 
 }

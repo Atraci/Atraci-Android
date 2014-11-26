@@ -39,8 +39,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"
                 android:value="net.getatraci.atraci.activities.SearchActivity" />
-                 />
-        </activity>
+                 />        </activity>
         <activity android:name="net.getatraci.atraci.activities.HomeActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" >
         </activity>

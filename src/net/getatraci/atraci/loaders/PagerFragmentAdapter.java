@@ -2,9 +2,8 @@ package net.getatraci.atraci.loaders;
 
 import net.getatraci.atraci.activities.PlayerFragment;
 import net.getatraci.atraci.activities.RootFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
@@ -13,12 +12,12 @@ public class PagerFragmentAdapter extends FragmentPagerAdapter {
 	
 	SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 	
-	public PagerFragmentAdapter(FragmentManager fm) {
+	public PagerFragmentAdapter(android.support.v4.app.FragmentManager fm) {
 		super(fm);
 	}
 
 	@Override
-	public Fragment getItem(int pos) {
+	public android.support.v4.app.Fragment getItem(int pos) {
 		// TODO Auto-generated method stub
 		switch(pos) {
 		case 0:

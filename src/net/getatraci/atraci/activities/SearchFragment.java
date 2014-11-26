@@ -13,16 +13,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.app.SearchManager;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,12 +35,14 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
-public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener, OnCloseListener {
+public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener, OnCloseListener, TextWatcher, OnEditorActionListener {
 
 	private ListView list;
 	private Timer timer = new Timer();
@@ -54,6 +58,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
 		// Inflate the fragment layout
 		View view = inflater.inflate(R.layout.activity_search,
 				container,
@@ -85,27 +90,24 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Inflate the menu; this adds items to the action bar if it is present.
+		Log.d("ATRACI", "search options menu");
+		
 		getActivity().getMenuInflater().inflate(R.menu.searchview, menu);
+		menu.findItem(R.id.action_searchview).setActionView(R.layout.actionbar_edittext);
+		searchField = (EditText)menu.findItem(R.id.action_searchview).getActionView().findViewById(R.id.addplaylist_field);
+		searchField.setOnEditorActionListener(this);
+		ImageButton ib = (ImageButton) menu.findItem(R.id.action_searchview).getActionView().findViewById(R.id.addplaylist_button);
+		ib.setClickable(false);
+		ib.setImageResource(R.drawable.ic_action_search);
+		searchField.addTextChangedListener(this);
+		searchField.setImeActionLabel(getActivity().getResources().getString(R.string.search), KeyEvent.KEYCODE_ENTER);
 		menu.removeItem(R.id.action_search);
-
-		SearchManager searchManager =
-				(SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView =
-				(SearchView) menu.findItem(R.id.action_searchview).getActionView();
-		searchView.setSearchableInfo(
-				searchManager.getSearchableInfo(getActivity().getComponentName()));
-		searchView.setIconified(false);
-		searchView.setOnQueryTextListener(this);
-		searchView.setOnCloseListener(this);
-
-		View searchPlate = searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null));
-		searchPlate.setBackgroundResource(R.drawable.textfield_searchview);
-		searchField = (EditText) searchView.findViewById(searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null));
 		searchField.setTextColor(Color.WHITE);
 		searchField.setHintTextColor(Color.GRAY);
-		searchField.setHint(getResources().getString(R.string.seach_hint));
+		searchField.setHint(getResources().getString(R.string.search_hint));
 		searchField.setFocusable(true);
 		searchField.requestFocus();
+		searchField.setBackgroundResource(R.drawable.textfield_searchview);
 		showKeyBoard(getActivity());
 		super.onCreateOptionsMenu(menu, inflater);
 	}
@@ -198,24 +200,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	@Override
 	public boolean onQueryTextChange(final String newText) {
 
-		timer.cancel();
-		timer = new Timer();
-		timer.schedule(new TimerTask(){
 
-			@Override
-			public void run() {
-				getActivity().runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						Bundle bundle = new Bundle();
-						String text = newText.replaceAll(" ", "%20");
-						bundle.putString("query", text);
-						getLoaderManager().restartLoader(LID_LFM, bundle, SearchFragment.this);
-					}});		
-			}
-
-		}, SEARCH_TRIGGER_DELAY_IN_MS);
 
 		return true;
 	}
@@ -248,5 +233,48 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	public static void showKeyBoard(Activity activity){
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+		//Do nothing.
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+		//Do nothing.
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		timer.cancel();
+		timer = new Timer();
+		timer.schedule(new TimerTask(){
+
+			@Override
+			public void run() {
+				getActivity().runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						Bundle bundle = new Bundle();
+						String text = searchField.getText().toString().replaceAll(" ", "%20");
+						bundle.putString("query", text);
+						getLoaderManager().restartLoader(LID_LFM, bundle, SearchFragment.this);
+					}});		
+			}
+
+		}, SEARCH_TRIGGER_DELAY_IN_MS);
+		
+	}
+
+	@Override
+	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		Bundle bundle = new Bundle();
+		String text = searchField.getText().toString().replaceAll(" ", "%20");
+		bundle.putString("query", text);
+		getLoaderManager().restartLoader(LID_LFM, bundle, SearchFragment.this);
+		return true;
 	}
 }
