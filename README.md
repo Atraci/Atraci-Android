@@ -9,7 +9,7 @@ two support libraries are needed in order to build this application:
 </ul>    
     
     
-Screenshots:
+<h2>Screenshots:</h2>
 
 <img src="http://i.imgur.com/1PpEwW4.jpg" width="250px" height="400px" />
 <br>
