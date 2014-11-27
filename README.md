@@ -16,5 +16,9 @@ two support libraries are needed in order to build this application:
 <img src="http://i.imgur.com/obEDS8p.png" width="250px" height="400px" />
 <br>
 <img src="http://i.imgur.com/iOWRIsU.png" width="250px" height="400px" />
+<br>
+<img src="http://i.imgur.com/dyCPwCz.png" width="250px" height="400px" />
+<br>
+<img src="http://i.imgur.com/yv3OQ77.png" width="250px" height="400px" />
 	
 	
