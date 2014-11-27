@@ -10,6 +10,6 @@ two support libraries are needed in order to build this application.
     
 Screenshots:
 
-![alt tag](http://i.imgur.com/1PpEwW4.jpg)
+![alt tag](http://i.imgur.com/1PpEwW4.jpg = 250x)
 	
 	
