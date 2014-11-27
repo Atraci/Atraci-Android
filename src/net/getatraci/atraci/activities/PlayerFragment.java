@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -12,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.AsyncYoutubeGetter;
 import net.getatraci.atraci.data.MusicItem;
+import net.getatraci.atraci.interfaces.MediaSessionCallbacks;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
 import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
@@ -21,19 +23,24 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -76,6 +83,9 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private Bundle bundle;
 	private boolean HTMLLoaded = false;
 	private int timePlayed = 0;
+	private Stack<Integer> playQueue;
+	MediaSessionCompat mMediaSession;
+	MediaControllerCompat mMediaController;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,6 +98,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		//manager = getLoaderManager();
 		//loader = new PlayerLoader(this);
 		mNotifyMgr = (NotificationManager) getActivity().getSystemService(Activity.NOTIFICATION_SERVICE);
+		playQueue = new Stack<Integer>();
 		//wv = (CustomWebView)view.findViewById(R.id.youtube_view);
 		wv = new WebView(getActivity());
 		setUpWebview();
@@ -125,7 +136,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 			return view;
 		}
 		else if(bundle == null){
-			bundle = savedInstanceState.getBundle("oldBundle");
+			bundle = savedInstanceState;
 		}
 		query = bundle.getParcelableArrayList("values");
 		position = bundle.getInt("position");
@@ -139,7 +150,17 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		setRetainInstance(true);
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Start listening for button presses
-		am.registerMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
+		mMediaSession = new MediaSessionCompat(getActivity(), "123");
+		mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+		mMediaSession.setCallback(new MediaSessionCallbacks());
+		mMediaSession.setActive(true);
+		try {
+			mMediaController = new MediaControllerCompat(getActivity(), mMediaSession.getSessionToken());
+			
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 	}
 	
@@ -155,7 +176,6 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public void onDestroyView() {
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Stop listening for button presses
-		am.unregisterMediaButtonEventReceiver(new ComponentName(getActivity().getPackageName(),RemoteControlReceiver.class.getName()));
 		pauseVideo();
 		wv.destroy();
 		super.onDestroyView();
@@ -163,6 +183,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	
 	public void loadNewBundle(Bundle bundle) {
 		this.bundle = bundle;
+		playQueue.clear();
 		if(bundle != null) {
 			query = bundle.getParcelableArrayList("values");
 			position = bundle.getInt("position");
@@ -306,6 +327,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 			public void onClick(View v) {
 				shuffle = (shuffle ? false : true);
 				shuffle_button.setImageResource((shuffle ? R.drawable.ic_action_shuffle_on : R.drawable.ic_action_shuffle_off));
+				playQueue.clear(); //Remove the play queue since the user is wanting to restart shuffling
 			}
 		});
 	}
@@ -491,6 +513,8 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		Notification.Builder builder = new Notification.Builder(getActivity());
 		builder.setContentIntent(pendInt);
 		builder.setSmallIcon(R.drawable.ic_launcher);
+		builder.setLargeIcon(BitmapFactory.decodeResource(getActivity().getResources(),
+                R.drawable.ic_launcher));
 		builder.setTicker(ticker);
 		builder.setOngoing(true);
 		builder.setContentTitle(title);
@@ -610,7 +634,11 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		r.setSeed(System.nanoTime()*System.currentTimeMillis());
 		int i = r.nextInt(query.size()-1);
 
-		if(i != position) {
+		if(!playQueue.contains(i)) {
+			playQueue.add(i);
+			
+			if(playQueue.size() > (query.size() / 2)) //If the queue grows larger than half the queue, remove the lowest element so the song can be used again
+				playQueue.remove(0);
 			return i;
 		}
 
@@ -628,7 +656,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 		//Set the webclients to support HTML5
 		//wv.setWebViewClient(new WebViewClient());
-		//wv.setWebChromeClient(new WebChromeClient());
+		wv.setWebChromeClient(new WebChromeClient());
 		//Set the javascript interface
 		wv.addJavascriptInterface(new PlayerJSInterface(this), "JSInt");
 		wv.setPadding(0, 0, 0, 0);

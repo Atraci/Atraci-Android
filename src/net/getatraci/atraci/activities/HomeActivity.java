@@ -145,9 +145,9 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 			pager.setCurrentItem(0);
 			confirmExit = false;
 		}
-		else if(getFragmentManager().getBackStackEntryCount() > 0) {
+		else if(getSupportFragmentManager().getBackStackEntryCount() > 0) {
 			try {
-				getFragmentManager().popBackStack();
+				getSupportFragmentManager().popBackStack();
 				confirmExit = false;
 			} catch (IllegalStateException e) {
 			}
@@ -208,7 +208,7 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 			break;
 
 		case 5:		//Settings item clicked
-			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment(this)).addToBackStack(null).commit();
+			this.getSupportFragmentManager().beginTransaction().replace(R.id.root_frame, new SettingsFragment(this)).addToBackStack(null).commit();
 			break;
 		}
 		// Set which item was selected in the nav drawer

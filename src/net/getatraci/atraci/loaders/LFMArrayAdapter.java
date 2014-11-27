@@ -3,8 +3,13 @@ package net.getatraci.atraci.loaders;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.MusicItem;
 import net.getatraci.atraci.data.MusicTypeCategories;
+import net.getatraci.atraci.layouthelpers.RoundedImageView;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -107,8 +112,9 @@ public class LFMArrayAdapter extends BaseAdapter {
 		if(convertView == null)
 			convertView = layoutInflater.inflate(R.layout.searchlist_item, parent, false);
 		
-		TextView txt = (TextView) convertView.findViewById(R.id.item1);
-		ImageView img = (ImageView) convertView.findViewById(R.id.album_art);
+		TextView txt1 = (TextView) convertView.findViewById(R.id.item1);
+		TextView txt2 = (TextView) convertView.findViewById(R.id.item2);
+		RoundedImageView img = (RoundedImageView) convertView.findViewById(R.id.album_art);
 		String text = type == TYPE_ARTIST ? "Artists" : type == TYPE_ALBUM ? "Albums" : "Songs";
 		if(m_data.getTotalSize() < 1)
 			return convertView;
@@ -117,18 +123,19 @@ public class LFMArrayAdapter extends BaseAdapter {
 		Log.d("ATRACI", "Type: " + text + "  Position: " + position + " Artist Size: "+m_data.getArtistCount() + "Album Size: " + m_data.getAlbumCount() + "Song Size: "+ m_data.getSongCount() + " Total Size: " + m_data.getTotalSize());
         switch(type) {
         case TYPE_SONG:
-        	
-			new ImageDownloader(img,m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getImage_med());
+			new ImageDownloader(img,m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getImage_lrg());
 //        	txt.setText(m_data.getSong(Math.abs(position - m_data.getAlbumCount()- m_data.getArtistCount()-3)).getTrack());
-			txt.setText(m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getTrack());
+			txt1.setText(m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getTrack());
+			txt2.setText(m_data.getSong(position - (m_data.getArtistCount() + m_data.getAlbumCount() + 3)).getArtist());
         	break;
         case TYPE_ALBUM:
-        	new ImageDownloader(img,m_data.getAlbum(position-(m_data.getArtistCount()+2)).getImage_med());
-        	txt.setText(m_data.getAlbum(position-m_data.getArtistCount()-2).getAlbum());
+        	new ImageDownloader(img,m_data.getAlbum(position-(m_data.getArtistCount()+2)).getImage_lrg());
+        	txt1.setText(m_data.getAlbum(position-m_data.getArtistCount()-2).getAlbum());
+        	txt2.setText(m_data.getAlbum(position-m_data.getArtistCount()-2).getArtist());
         	break;
         case TYPE_ARTIST:
-        	new ImageDownloader(img,m_data.getArtist(position-1).getImage_med());
-        	txt.setText(m_data.getArtist(position-1).getArtist());
+        	new ImageDownloader(img,m_data.getArtist(position-1).getImage_lrg());
+        	txt1.setText(m_data.getArtist(position-1).getArtist());
         	break;
         }
 		} catch (Exception e) {
@@ -153,7 +160,5 @@ public class LFMArrayAdapter extends BaseAdapter {
 		tv.setShadowLayer(1, 0, 0, Color.BLACK);
 		layout.addView(tv);
 		return layout;
-	}
-	
-	
+	}	
 }

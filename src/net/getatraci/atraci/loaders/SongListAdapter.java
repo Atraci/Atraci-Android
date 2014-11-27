@@ -57,8 +57,7 @@ public class SongListAdapter extends BaseAdapter {
 		name = (TextView)v.getTag(R.id.text);
 		picture.setImageResource(R.drawable.record);
 
-		if(images[position] != null && position != 0){
-			images[position].cancel(true);
+		if(images[position] != null && images[position].getImage() != null){
 			picture.setImageBitmap(images[position].getImage());
 		} else {
 			images[position] = new ImageDownloader(picture, items.get(position).getImage_lrg());
