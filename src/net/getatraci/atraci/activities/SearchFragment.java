@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -42,7 +43,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener, OnCloseListener, TextWatcher, OnEditorActionListener {
+public class SearchFragment extends Fragment implements OnItemClickListener, LoaderCallbacks<LFMArrayAdapter>, OnQueryTextListener, OnCloseListener, OnClickListener, TextWatcher, OnEditorActionListener {
 
 	private ListView list;
 	private Timer timer = new Timer();
@@ -51,6 +52,10 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 	private SongListFragment songlist;
 	private EditText searchField;
 
+	public SearchFragment(){
+		songlist = new SongListFragment();
+	}
+	
 	public SearchFragment(SongListFragment sl) {
 		songlist = sl;
 	}
@@ -99,6 +104,7 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 		ImageButton ib = (ImageButton) menu.findItem(R.id.action_searchview).getActionView().findViewById(R.id.addplaylist_button);
 		ib.setClickable(false);
 		ib.setImageResource(R.drawable.ic_action_search);
+		ib.setOnClickListener(this);
 		searchField.addTextChangedListener(this);
 		searchField.setImeActionLabel(getActivity().getResources().getString(R.string.search), KeyEvent.KEYCODE_ENTER);
 		menu.removeItem(R.id.action_search);
@@ -271,10 +277,20 @@ public class SearchFragment extends Fragment implements OnItemClickListener, Loa
 
 	@Override
 	public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-		Bundle bundle = new Bundle();
 		String text = searchField.getText().toString().replaceAll(" ", "%20");
+		Bundle bundle = new Bundle();
 		bundle.putString("query", text);
-		getLoaderManager().restartLoader(LID_LFM, bundle, SearchFragment.this);
+		bundle.putBoolean("isPlaylist", false);
+		launchSongList(bundle);
 		return true;
+	}
+
+	@Override
+	public void onClick(View v) {
+		String text = searchField.getText().toString().replaceAll(" ", "%20");
+		Bundle bundle = new Bundle();
+		bundle.putString("query", text);
+		bundle.putBoolean("isPlaylist", false);
+		launchSongList(bundle);
 	}
 }

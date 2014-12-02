@@ -41,9 +41,20 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 	private static DatabaseHelper database;
 	public static ViewPager pager;
 	private boolean confirmExit = false;
-	static PagerFragmentAdapter pageAdapter;
-	SearchFragment search;
-	PlaylistSelectorFragment playlists;
+	private static PagerFragmentAdapter pageAdapter;
+	public static PagerFragmentAdapter getPageAdapter() {
+		return pageAdapter;
+	}
+
+
+
+	public static void setPageAdapter(PagerFragmentAdapter pageAdapter) {
+		HomeActivity.pageAdapter = pageAdapter;
+	}
+
+
+
+	private static SearchFragment search;
 	public static SongListFragment songlist;
 	public static Toolbar mToolbar;
 

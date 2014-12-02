@@ -9,7 +9,8 @@
         android:id="@+id/addplaylist_field"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:hint="@string/playlist_hint" >
+        android:hint="@string/playlist_hint"
+        android:singleLine="true" >
                 <requestFocus /> 
     </EditText>
     
@@ -19,7 +20,8 @@
         android:layout_height="match_parent"
         android:background="@null"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_action_new" >
+        android:src="@drawable/ic_action_new"
+        android:contentDescription="@string/search" >
         
     </ImageButton>
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -123,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			item.setImage_med(c.getString(c.getColumnIndex(SONGS_COVER_MED)));
 			songs.add(item);
 		} while(c.moveToNext());
-		Collections.reverse(songs);
+			Collections.reverse(songs);
 		return songs;
 	}
 	

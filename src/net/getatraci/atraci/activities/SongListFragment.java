@@ -230,12 +230,10 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 
 	private void startPlayerActivity(ArrayList<MusicItem> songs, int pos) {
 		Bundle bundle = new Bundle();
-		//bundle.putStringArray("values", songs);
 		bundle.putParcelableArrayList("values", songs);
 		bundle.putInt("position", pos);
-		((SongListAdapter)m_gridview.getAdapter()).cancelAllImageLoads();
-		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).setHTMLLoaded(true);
-		((PlayerFragment)HomeActivity.pageAdapter.getRegisteredFragment(1)).loadNewBundle(bundle);
+		((PlayerFragment)HomeActivity.getPageAdapter().getRegisteredFragment(1)).setHTMLLoaded(true);
+		((PlayerFragment)HomeActivity.getPageAdapter().getRegisteredFragment(1)).loadNewBundle(bundle);
 		HomeActivity.pager.setCurrentItem(1);
 	}
 
@@ -244,6 +242,7 @@ public class SongListFragment extends Fragment implements LoaderCallbacks<SongLi
 		GridView grid = (GridView)adapter.findViewById(R.id.gridview);
 		HomeActivity.getDatabase().addToHistory((MusicItem)grid.getAdapter().getItem(position));
 		startPlayerActivity(results, position);	
+		((SongListAdapter)m_gridview.getAdapter()).cancelAllImageLoads();
 	}
 
 	@Override

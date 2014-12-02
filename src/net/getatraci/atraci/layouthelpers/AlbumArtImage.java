@@ -2,8 +2,9 @@ package net.getatraci.atraci.layouthelpers;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
-public class AlbumArtImage extends RoundedImageView {
+public class AlbumArtImage extends ImageView {
 
 	public AlbumArtImage(Context context) {
 		super(context);

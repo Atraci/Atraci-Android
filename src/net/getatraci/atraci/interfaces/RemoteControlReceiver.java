@@ -62,9 +62,6 @@ public class RemoteControlReceiver extends BroadcastReceiver {
 					}
 				}
 			}
-			else if(KeyEvent.KEYCODE_CALL == event.getKeyCode()) {
-				player.pauseVideo();
-			}
 		}
 	}
 

@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutionException;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.AsyncYoutubeGetter;
 import net.getatraci.atraci.data.MusicItem;
-import net.getatraci.atraci.interfaces.MediaSessionCallbacks;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
 import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
@@ -26,12 +25,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -150,17 +147,17 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		setRetainInstance(true);
 		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Start listening for button presses
-		mMediaSession = new MediaSessionCompat(getActivity(), "123");
-		mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
-		mMediaSession.setCallback(new MediaSessionCallbacks());
-		mMediaSession.setActive(true);
-		try {
-			mMediaController = new MediaControllerCompat(getActivity(), mMediaSession.getSessionToken());
-			
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		mMediaSession = new MediaSessionCompat(getActivity(), "123");
+//		mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
+//		mMediaSession.setCallback(new MediaSessionCallbacks());
+//		mMediaSession.setActive(true);
+//		try {
+//			mMediaController = new MediaControllerCompat(getActivity(), mMediaSession.getSessionToken());
+//			
+//		} catch (RemoteException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 	}
 	
@@ -231,12 +228,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		} catch (InterruptedException | ExecutionException | MalformedURLException e) {
 			e.printStackTrace();
 		}
-		if(position + 3 < query.size()-1){
-			queue_list.smoothScrollToPosition(position + 3);
-		} else {
 			queue_list.smoothScrollToPosition(position);
-		}
-		
 	}
 
 	public void setSeekbarOnChange() {

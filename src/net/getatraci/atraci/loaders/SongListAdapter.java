@@ -38,6 +38,10 @@ public class SongListAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return 0;
 	}
+	
+	public ImageDownloader getImageDownloader(int pos){
+		return images[pos];
+	}
 
 	// create a new ImageView for each item referenced by the Adapter
 	public View getView(int position, View view, ViewGroup viewGroup)
