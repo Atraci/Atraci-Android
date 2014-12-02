@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -230,7 +231,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		}
 			queue_list.smoothScrollToPosition(position);
 	}
-
+	
 	public void setSeekbarOnChange() {
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 

@@ -197,11 +197,7 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		pager.setCurrentItem(0); //If user is using the nav drawer to make selection, we always want to see the root fragment
-		//getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		switch(position) {
-//		case 0:		// Home item clicked
-//			this.getFragmentManager().beginTransaction().replace(R.id.root_frame, new RootFragment()).addToBackStack(null).commit();
-//			break;
 		case 0:		// Top 100 tracks item clicked
 			launchTop100();
 			break;
