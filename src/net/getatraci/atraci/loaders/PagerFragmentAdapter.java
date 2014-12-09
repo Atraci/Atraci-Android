@@ -18,7 +18,6 @@ public class PagerFragmentAdapter extends FragmentPagerAdapter {
 
 	@Override
 	public android.support.v4.app.Fragment getItem(int pos) {
-		// TODO Auto-generated method stub
 		switch(pos) {
 		case 0:
 			return new RootFragment();

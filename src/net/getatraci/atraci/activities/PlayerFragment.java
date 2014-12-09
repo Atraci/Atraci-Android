@@ -505,7 +505,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 		//Create our notification
 		Notification.Builder builder = new Notification.Builder(getActivity());
 		builder.setContentIntent(pendInt);
-		builder.setSmallIcon(R.drawable.ic_launcher);
+		builder.setSmallIcon(R.drawable.not_icon);
 		builder.setLargeIcon(BitmapFactory.decodeResource(getActivity().getResources(),
                 R.drawable.ic_launcher));
 		builder.setTicker(ticker);

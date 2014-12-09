@@ -2,6 +2,7 @@ package net.getatraci.atraci.activities;
 
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.DatabaseHelper;
+import net.getatraci.atraci.layouthelpers.PlayerPageTransformer;
 import net.getatraci.atraci.loaders.PagerFragmentAdapter;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -67,6 +68,7 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 		getSupportActionBar().show();
 		pager = (ViewPager)findViewById(R.id.content_frame);
 		pager.setOffscreenPageLimit(2);
+		pager.setPageTransformer(true, new PlayerPageTransformer());
 		pageAdapter = new PagerFragmentAdapter(this.getSupportFragmentManager());
 		pager.setAdapter(pageAdapter);
 		database = new DatabaseHelper(this.getApplicationContext());
@@ -288,9 +290,9 @@ public class HomeActivity extends ActionBarActivity implements OnItemClickListen
 	@Override
 	public void onPageSelected(int pos) {
 		if(pos == 1){
-			getSupportActionBar().hide();
+			getSupportActionBar().setTitle(getResources().getStringArray(R.array.navigation_items)[3]);
 		} else {
-			getSupportActionBar().show();
+			getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
 		}
 	}
 }
