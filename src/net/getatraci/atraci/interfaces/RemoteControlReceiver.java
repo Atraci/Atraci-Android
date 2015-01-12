@@ -18,6 +18,9 @@ public class RemoteControlReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final PlayerFragment player = (PlayerFragment)((PagerFragmentAdapter)HomeActivity.pager.getAdapter()).getRegisteredFragment(1);
+		if(player == null){ //If the player doesn't exist at this time, don't do anything.
+			return;
+		}
 		Log.d("ATRACI", intent.getAction().toString());
 		if(Intent.ACTION_HEADSET_PLUG.equals(intent.getAction())){
 			player.pauseVideo();
