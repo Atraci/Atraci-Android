@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL"/>
 
     <application
         android:allowBackup="true"
@@ -64,6 +65,7 @@
             <intent-filter android:priority="2147483647" >
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.intent.action.HEADSET_PLUG" />
+                <action android:name="net.getatraci.atraci.ACTION_PLAY" />
             </intent-filter>
         </receiver>
     </application>

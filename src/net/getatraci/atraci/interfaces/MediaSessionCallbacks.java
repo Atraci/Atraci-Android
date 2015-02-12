@@ -8,7 +8,9 @@ import android.util.Log;
 
 public class MediaSessionCallbacks extends MediaSessionCompat.Callback {
 	
-	
+	public MediaSessionCallbacks() {
+		Log.d("ATRACI", "MediaSessionStarted");
+	}
 	
 	@Override
 	public boolean onMediaButtonEvent(Intent mediaButtonEvent) {

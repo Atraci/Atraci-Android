@@ -1,7 +1,6 @@
 package net.getatraci.atraci.layouthelpers;
 
 import android.support.v4.view.ViewPager.PageTransformer;
-import android.util.Log;
 import android.view.View;
 
 
@@ -44,8 +43,7 @@ public class PlayerPageTransformer implements PageTransformer  {
             view.setScaleX(scaleFactor);
             view.setScaleY(scaleFactor);
             view.setRotationX(180*position);
-            Log.d("ATRACI", "Position: " + position);
-
+	
         } else { // (1,+Infinity]
             // This page is way off-screen to the right.
             view.setAlpha(0);

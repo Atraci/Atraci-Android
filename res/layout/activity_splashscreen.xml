@@ -15,6 +15,7 @@
         android:src="@drawable/splash" />
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -23,5 +24,14 @@
         android:text="@string/website"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:paddingBottom="100dp"
+        android:text="" />
 
 </RelativeLayout>

@@ -1,8 +1,9 @@
 package net.getatraci.atraci.data;
 
+import net.getatraci.atraci.json.JSONParser;
+
 import org.json.JSONException;
 
-import net.getatraci.atraci.json.JSONParser;
 import android.os.AsyncTask;
 
 public class AsyncYoutubeGetter extends AsyncTask<String, Void, String> {
@@ -18,6 +19,7 @@ public class AsyncYoutubeGetter extends AsyncTask<String, Void, String> {
 			return JSONParser.parseYoutube(song);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			
 		}
 		return null;
 	}

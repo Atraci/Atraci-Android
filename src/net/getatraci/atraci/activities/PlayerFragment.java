@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 import net.getatraci.atraci.R;
 import net.getatraci.atraci.data.AsyncYoutubeGetter;
 import net.getatraci.atraci.data.MusicItem;
+import net.getatraci.atraci.interfaces.MediaSessionCallbacks;
+import net.getatraci.atraci.interfaces.PlayerIntent;
 import net.getatraci.atraci.interfaces.PlayerJSInterface;
 import net.getatraci.atraci.interfaces.RemoteControlReceiver;
 import net.getatraci.atraci.json.JSONParser;
@@ -22,15 +24,17 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.media.session.MediaController;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -83,7 +87,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	private int timePlayed = 0;
 	private Stack<Integer> playQueue;
 	MediaSessionCompat mMediaSession;
-	MediaControllerCompat mMediaController;
+	MediaController mMediaController;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -146,7 +150,13 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
-		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+		MediaSessionCompat session = new MediaSessionCompat(getActivity(), "player");
+		session.setCallback(new MediaSessionCallbacks());
+		MediaControllerCompat controller = new MediaControllerCompat(getActivity(), session);
+		mMediaController = (MediaController) controller.getMediaController();
+			AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+			RemoteControlReceiver rcr = new RemoteControlReceiver();
+			am.registerMediaButtonEventReceiver(new ComponentName(RemoteControlReceiver.class.getPackage().getName(), RemoteControlReceiver.class.getSimpleName()));
 		// Start listening for button presses
 //		mMediaSession = new MediaSessionCompat(getActivity(), "123");
 //		mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS);
@@ -159,7 +169,10 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-		getActivity().registerReceiver(new RemoteControlReceiver(), new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+			IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+			filter.addAction(Intent.ACTION_MEDIA_BUTTON);
+			filter.addAction(PlayerIntent.ACTION_PLAY);
+		getActivity().registerReceiver(rcr, filter);
 	}
 	
 	
@@ -172,7 +185,7 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 
 	@Override
 	public void onDestroyView() {
-		AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
+		//AudioManager am = (AudioManager)getActivity().getSystemService(Context.AUDIO_SERVICE);
 		// Stop listening for button presses
 		pauseVideo();
 		wv.destroy();
@@ -501,9 +514,18 @@ public class PlayerFragment extends Fragment implements OnItemClickListener{
 				0,
 				notIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
-
+		
+		PendingIntent playPendingIntent;
+		Intent intent = new Intent();
+		intent.setAction(PlayerIntent.ACTION_PLAY);
+		intent.setClass(getActivity(), getClass());
+		playPendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		
 		//Create our notification
-		Notification.Builder builder = new Notification.Builder(getActivity());
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity());
+		builder.setPriority(Notification.PRIORITY_MAX);
+		builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+		builder.addAction(R.drawable.ic_action_play, "Play", playPendingIntent);
 		builder.setContentIntent(pendInt);
 		builder.setSmallIcon(R.drawable.not_icon);
 		builder.setLargeIcon(BitmapFactory.decodeResource(getActivity().getResources(),
